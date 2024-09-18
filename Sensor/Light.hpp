@@ -6,11 +6,9 @@
 #define TP_LIGHT_HPP
 
 
-
 class Light {
 
 };
-
 
 
 #endif //TP_LIGHT_HPP

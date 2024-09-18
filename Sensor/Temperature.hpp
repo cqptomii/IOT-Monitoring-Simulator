@@ -6,11 +6,9 @@
 #define TP_TEMPERATURE_HPP
 
 
-
 class temperature {
 
 };
-
 
 
 #endif //TP_TEMPERATURE_HPP

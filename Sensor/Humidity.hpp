@@ -6,11 +6,9 @@
 #define TP_HUMIDITY_HPP
 
 
-
 class Humidity {
 
 };
-
 
 
 #endif //TP_HUMIDITY_HPP

@@ -8,8 +8,6 @@
 #include <filesystem>
 #include <ctime>
 #include <string>
-#include "Sensor/Sensor.h"
-
 class Server {
 private:
     std::filesystem::path logfile_path;

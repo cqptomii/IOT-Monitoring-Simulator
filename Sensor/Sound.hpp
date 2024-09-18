@@ -6,11 +6,9 @@
 #define TP_SOUND_HPP
 
 
-
 class Sound {
 
 };
-
 
 
 #endif //TP_SOUND_HPP
