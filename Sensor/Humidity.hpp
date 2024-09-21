@@ -4,10 +4,17 @@
 
 #ifndef TP_HUMIDITY_HPP
 #define TP_HUMIDITY_HPP
+#include "Sensor.h"
 
-
-class Humidity {
-
+class Humidity : public Sensor<float> {
+private:
+    float readValue() override;
+public:
+    Humidity();
+    Humidity(const Humidity& hum);
+    Humidity(std::string sensor_name);
+    ~Humidity() override = default;
+    Humidity& operator=(const Humidity& hum);
 };
 
 

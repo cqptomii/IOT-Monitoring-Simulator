@@ -4,10 +4,17 @@
 
 #ifndef TP_TEMPERATURE_HPP
 #define TP_TEMPERATURE_HPP
+#include "Sensor.h"
 
-
-class temperature {
-
+class Temperature : public Sensor<float>{
+private:
+    float readValue() override;
+public:
+    Temperature();
+    Temperature(const Temperature& temp);
+    Temperature(std::string sensor_name);
+    ~Temperature() override = default;
+    Temperature& operator=(const Temperature& temp);
 };
 
 

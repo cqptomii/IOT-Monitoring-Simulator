@@ -6,56 +6,135 @@
 #define TP_SENSOR_H
 #include <string>
 #include <functional>
+#include <utility>
+#include <random>
 #include "../Server.hpp"
+#include "../Scheduler.hpp"
+
+int random_int();
 
 template<typename T>
 class Sensor {
 private:
     size_t ID;
     std::string name;
-    std::string type;
     Server *associed_server;
 
 
     unsigned int read_interval;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_read;
+    /**
+     * @brief permet de generer une valeur aleatoire en fonction du type de donnée du capteur
+     * @return valeur aléatoire d'un type donné
+     */
+    virtual T readValue() = 0;
+    /**
+     * @brief met à jour la valeur du capteur si le capteur est prêt à lire une valeur
+     */
+    bool execute(){
+        if (isReady()){
+            last_read = std::chrono::high_resolution_clock::now();
+            data = readValue();
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * @brief
+     * @return
+     */
+    bool isReady(){
+        std::chrono::time_point<std::chrono::high_resolution_clock > currentTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<unsigned int, std::milli> duration  = currentTime - this->last_read;
+
+        return (duration.count() >= this->read_interval);
+    }
 
 protected:
     T data;
+    std::string type;
+    /**
+     * @brief simule le comportement dynamique du capteur
+     */
+    void update(){
+        if(execute()){
+            std::tuple<size_t,std::string, std::string , T> message(ID,type,name,data);
+            this->associed_server << message;
+        }
+    }
+
+    /**
+     * @brief permet de generer une identifiant unique alétoire
+     * @return identifiant
+     */
+    void generateId(){
+        std::string id_unhashed = this->type;
+        int value = random_int();
+
+        id_unhashed += std::to_string(value);
+        std::hash<std::string> hash_id;
+        this->ID = hash_id(id_unhashed);
+    }
+
 public:
     /**
      * @brief Constructeur par default de la classe Sensor
      */
-    Sensor(){
-
+    Sensor() : name("sensor"),read_interval(1000),data(0),type("default"),ID(0){
+        associed_server = nullptr;
+        this->last_read = std::chrono::high_resolution_clock::now();
     }
     /**
      * @brief Constructeur par recopie de la classe Sensor
      *
      * @param sensor : capteur à recopier
      */
-    Sensor(const Sensor& sensor){
+    Sensor(const Sensor& sensor) : ID(sensor.ID),name(sensor.name),type(sensor.type),data(sensor.data), read_interval(sensor.read_interval), associed_server(sensor.associed_server){
+        last_read = std::chrono::high_resolution_clock::now();
+    }
 
+    /**
+     * @brief Constructeur surchargé de la classe Sensor
+     * @param sensor_name : nom attribué au capteur
+     * @param interval : interval de temps entre chaque lecture de valeur
+     */
+    Sensor(std::string sensor_name) : name(std::move(sensor_name)), read_interval(1000), associed_server(nullptr),ID(0){
+        last_read = std::chrono::high_resolution_clock::now();
     }
     /**
      * @brief Destructeur de la classe Sensor
     */
-    virtual ~Sensor() =default ;
+    virtual ~Sensor() = default ;
     /**
      * @brief Opérateur de copie de la classe Sensor
      *
      * @param sensor : capteur à copier
      */
-    Sensor &operator=(const Sensor& sensor){
+     Sensor &operator=(const Sensor& sensor){
+        if(this != &sensor){
+            ID = sensor.ID;
+            name = sensor.name;
+            type = sensor.type;
+            read_interval = sensor.read_interval;
+            associed_server = sensor.associed_server;
+        }
         return *this;
     }
+    void setIntervalRead(unsigned int interval){
+        if(interval >=1000){
+            this->read_interval = interval;
+        }
+    }
 
-    void updtate();
-    void execute();
-
-
-
+    friend class Scheduler;
 };
 
+int random_int(){
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<> distribution(15, 9999);
+    return distribution(generator);
+}
 
 #endif //TP_SENSOR_H

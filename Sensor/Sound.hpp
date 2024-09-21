@@ -4,10 +4,17 @@
 
 #ifndef TP_SOUND_HPP
 #define TP_SOUND_HPP
+#include "Sensor.h"
 
-
-class Sound {
-
+class Sound : public Sensor<int>{
+private:
+    int readValue() override;
+public:
+    Sound();
+    Sound(const Sound& s);
+    Sound(std::string sensor_name);
+    ~Sound() override = default;
+    Sound& operator=(const Sound& s);
 };
 
 
