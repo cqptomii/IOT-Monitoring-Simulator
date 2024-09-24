@@ -16,7 +16,7 @@ class Sensor {
 private:
     size_t ID;
     std::string name;
-    std::unique_ptr<Server> associed_server;
+    std::shared_ptr<Server> associed_server;
 
 
     unsigned int read_interval;
@@ -88,11 +88,11 @@ public:
     }
     /**
      * @brief Constructeur par recopie de la classe Sensor
-     *
+     *        Copie profonde du unique_ptr<Server>
      * @param sensor : capteur à recopier
      */
     Sensor(const Sensor& sensor) : ID(sensor.ID),name(sensor.name),type(sensor.type),data(sensor.data), read_interval(sensor.read_interval){
-        this->associed_server = std::make_unique<Server>(sensor.associed_server);
+        this->associed_server = sensor.associed_server;
         last_read = std::chrono::high_resolution_clock::now();
     }
 
@@ -119,7 +119,7 @@ public:
             name = sensor.name;
             type = sensor.type;
             read_interval = sensor.read_interval;
-            associed_server = std::make_unique<Server>(sensor.associed_server);
+            associed_server = sensor.associed_server;
         }
         return *this;
     }
