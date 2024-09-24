@@ -23,10 +23,10 @@ Temperature &Temperature::operator=(const Temperature &temp) {
     return *this;
 }
 
-float Temperature::readValue() {
+void Temperature::readValue() {
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<float> distribution(8.5,27.0);
 
-    return distribution(generator);
+    this->data = distribution(generator);
 }

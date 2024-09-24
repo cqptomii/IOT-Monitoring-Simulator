@@ -20,10 +20,10 @@ Humidity &Humidity::operator=(const Humidity &hum) {
     return *this;
 }
 
-float Humidity::readValue() {
+void Humidity::readValue() {
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<float> distribution(0.0,100.0);
 
-    return distribution(generator);
+    this->data = distribution(generator);
 }

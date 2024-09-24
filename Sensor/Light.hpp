@@ -7,7 +7,7 @@
 #include "Sensor.h"
 class Light : public Sensor<bool>{
 private:
-    bool readValue() override;
+    void readValue() override;
 public:
     Light();
     Light(const Light& l);

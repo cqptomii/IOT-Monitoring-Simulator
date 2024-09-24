@@ -8,7 +8,7 @@
 
 class Sound : public Sensor<int>{
 private:
-    int readValue() override;
+    void readValue() override;
 public:
     Sound();
     Sound(const Sound& s);

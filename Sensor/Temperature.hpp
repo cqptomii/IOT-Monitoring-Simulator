@@ -8,7 +8,7 @@
 
 class Temperature : public Sensor<float>{
 private:
-    float readValue() override;
+    void readValue() override;
 public:
     Temperature();
     Temperature(const Temperature& temp);

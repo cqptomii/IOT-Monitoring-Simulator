@@ -8,17 +8,15 @@
 #include <functional>
 #include <utility>
 #include <random>
+#include <memory>
 #include "../Server.hpp"
-#include "../Scheduler.hpp"
-
-int random_int();
 
 template<typename T>
 class Sensor {
 private:
     size_t ID;
     std::string name;
-    Server *associed_server;
+    std::unique_ptr<Server> associed_server;
 
 
     unsigned int read_interval;
@@ -27,14 +25,14 @@ private:
      * @brief permet de generer une valeur aleatoire en fonction du type de donnée du capteur
      * @return valeur aléatoire d'un type donné
      */
-    virtual T readValue() = 0;
+    virtual void readValue() = 0;
     /**
      * @brief met à jour la valeur du capteur si le capteur est prêt à lire une valeur
      */
     bool execute(){
         if (isReady()){
             last_read = std::chrono::high_resolution_clock::now();
-            data = readValue();
+            readValue();
             return true;
         }
 
@@ -46,7 +44,7 @@ private:
      */
     bool isReady(){
         std::chrono::time_point<std::chrono::high_resolution_clock > currentTime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<unsigned int, std::milli> duration  = currentTime - this->last_read;
+        std::chrono::duration<double, std::milli> duration(currentTime - this->last_read);
 
         return (duration.count() >= this->read_interval);
     }
@@ -55,12 +53,13 @@ protected:
     T data;
     std::string type;
     /**
-     * @brief simule le comportement dynamique du capteur
+     * @brief simule le comportement dynamique du capteur en envoyant un message au server associé
      */
     void update(){
         if(execute()){
             std::tuple<size_t,std::string, std::string , T> message(ID,type,name,data);
-            this->associed_server << message;
+            if(associed_server)
+                *this->associed_server << message;
         }
     }
 
@@ -70,7 +69,10 @@ protected:
      */
     void generateId(){
         std::string id_unhashed = this->type;
-        int value = random_int();
+        std::random_device rd;
+        std::default_random_engine generator(rd());
+        std::uniform_int_distribution<> distribution(15, 9999);
+        int value = distribution(generator);
 
         id_unhashed += std::to_string(value);
         std::hash<std::string> hash_id;
@@ -81,8 +83,7 @@ public:
     /**
      * @brief Constructeur par default de la classe Sensor
      */
-    Sensor() : name("sensor"),read_interval(1000),data(0),type("default"),ID(0){
-        associed_server = nullptr;
+    Sensor() : name("sensor"),read_interval(1000),data(0),type("default"),ID(0),associed_server(nullptr){
         this->last_read = std::chrono::high_resolution_clock::now();
     }
     /**
@@ -90,7 +91,8 @@ public:
      *
      * @param sensor : capteur à recopier
      */
-    Sensor(const Sensor& sensor) : ID(sensor.ID),name(sensor.name),type(sensor.type),data(sensor.data), read_interval(sensor.read_interval), associed_server(sensor.associed_server){
+    Sensor(const Sensor& sensor) : ID(sensor.ID),name(sensor.name),type(sensor.type),data(sensor.data), read_interval(sensor.read_interval){
+        this->associed_server = std::make_unique<Server>(sensor.associed_server);
         last_read = std::chrono::high_resolution_clock::now();
     }
 
@@ -117,7 +119,7 @@ public:
             name = sensor.name;
             type = sensor.type;
             read_interval = sensor.read_interval;
-            associed_server = sensor.associed_server;
+            associed_server = std::make_unique<Server>(sensor.associed_server);
         }
         return *this;
     }
@@ -129,12 +131,5 @@ public:
 
     friend class Scheduler;
 };
-
-int random_int(){
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_int_distribution<> distribution(15, 9999);
-    return distribution(generator);
-}
 
 #endif //TP_SENSOR_H

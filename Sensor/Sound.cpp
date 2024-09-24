@@ -23,10 +23,10 @@ Sound &Sound::operator=(const Sound &s) {
     return *this;
 }
 
-int Sound::readValue() {
+void Sound::readValue()  {
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_int_distribution distribution(0,120);
 
-    return distribution(generator);
+    this->data = distribution(generator);
 }

@@ -8,7 +8,7 @@
 
 class Humidity : public Sensor<float> {
 private:
-    float readValue() override;
+    void readValue() override;
 public:
     Humidity();
     Humidity(const Humidity& hum);

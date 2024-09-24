@@ -23,10 +23,10 @@ Light::Light(std::string sensor_name) : Sensor(std::move(sensor_name)) {
     generateId();
 }
 
-bool Light::readValue(){
+void Light::readValue(){
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::bernoulli_distribution bool_distrib(0.5);
 
-    return bool_distrib(generator);
+    this->data = bool_distrib(generator);
 }
