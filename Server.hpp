@@ -31,7 +31,7 @@ private:
      * @param data : Tuple contenant les données à ecrire dans le fichier de logs
      */
     template<typename T>
-    void fileWrite(std::ofstream& open_file ,const std::tuple<size_t ,std::string,std::string, T> &data){
+    void fileWrite(std::ostream& open_file ,const std::tuple<size_t ,std::string,std::string, T> &data){
         this->writting_format(open_file,data);
     }
 
@@ -41,7 +41,7 @@ private:
      * @param data :
      */
     template<typename T>
-    void writting_format(std::ofstream& os,const std::tuple<size_t ,std::string,std::string, T> &data){
+    void writting_format(std::ostream& os,const std::tuple<size_t ,std::string,std::string, T> &data){
          current_time = time(nullptr);
          std::string str_time = ctime(&current_time);
 
