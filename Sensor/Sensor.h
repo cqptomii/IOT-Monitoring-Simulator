@@ -57,7 +57,7 @@ protected:
      */
     void update(){
         if(execute()){
-            std::tuple<size_t,std::string, std::string , T> message(ID,type,name,data);
+            std::tuple<time_t,size_t,std::string, std::string , T> message(time(nullptr),ID,type,name,data);
             if(associed_server)
                 *this->associed_server << message;
         }
