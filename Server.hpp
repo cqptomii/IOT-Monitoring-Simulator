@@ -9,19 +9,29 @@
 #include <fstream>
 #include <ctime>
 #include <string>
+#include <vector>
+
 class Server {
 private:
     std::filesystem::path server_log_path;
     bool file_logs;
     bool console_logs;
-    std::time_t current_time;
+
+    unsigned int interval;
+    unsigned int count;
+
+    // Conteneur permettant au server de stocker les valeurs reçu par les capteurs
+    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, float>> temperature_values;
+    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, float>> humidity_values;
+    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, int>> sound_values;
+    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, bool>> light_values;
 
     /**
      * @brief Fonction permettant de visualiser les données reçues des capteurs dans la console
      * @param data : Tuple contenant les données à ecrire dans la console de logs
      */
     template<typename T>
-    void consoleWrite(const std::tuple<size_t ,std::string,std::string, T>& data){
+    void consoleWrite(const std::tuple<time_t ,size_t ,std::string,std::string, T>& data){
         this->writting_format(std::cout,data);
     }
 
@@ -31,7 +41,7 @@ private:
      * @param data : Tuple contenant les données à ecrire dans le fichier de logs
      */
     template<typename T>
-    void fileWrite(std::ostream& open_file ,const std::tuple<size_t ,std::string,std::string, T> &data){
+    void fileWrite(std::ostream& open_file ,const std::tuple<time_t ,size_t ,std::string,std::string, T> &data){
         this->writting_format(open_file,data);
     }
 
@@ -41,24 +51,23 @@ private:
      * @param data :
      */
     template<typename T>
-    void writting_format(std::ostream& os,const std::tuple<size_t ,std::string,std::string, T> &data){
-        current_time = time(nullptr);
-        std::string str_time = ctime(&current_time);
+    void writting_format(std::ostream& os,const std::tuple<time_t ,size_t ,std::string,std::string, T> &data){
+        std::string str_time = ctime(&std::get<0>(data));
 
         str_time.pop_back(); // supprime le "\n"
 
         os << str_time << " " << // current Time
-                   std::get<0>(data) << " " << // Sensor ID
-                   std::get<1>(data) << " " << // Sensor Type
-                   std::get<2>(data) << " " << // Senor name
-                   std::get<3>(data) << std::endl; // current data
+                   std::get<1>(data) << " " << // Sensor ID
+                   std::get<2>(data) << " " << // Sensor Type
+                   std::get<3>(data) << " " << // Senor name
+                   std::get<4>(data) << std::endl; // current data
     }
 
     /**
      * @brief write_data
      */
     template<typename T>
-    void writeData(const std::tuple<size_t ,std::string,std::string, T> &data){
+    void writeData(const std::tuple<time_t ,size_t ,std::string,std::string, T> &data){
         if(console_logs){
             consoleWrite(data);
         }
@@ -72,7 +81,7 @@ private:
                 }
             }
 
-            std::string sensor_logs_folder =(server_log_path / (std::get<1>(data) + "_" + std::get<2>(data) + ".txt")).string();
+            std::string sensor_logs_folder =(server_log_path / (std::get<2>(data) + "_" + std::get<3>(data) + ".txt")).string();
             std::cout << sensor_logs_folder;
             // Creation du fichier log associé au capteur si non existant
             try {
@@ -130,9 +139,19 @@ public:
      * @param data
      **/
     template<typename T>
-    void operator<<(const std::tuple<size_t ,std::string,std::string, T>& data) {
-        this->writeData(data);
+    void operator<<(const std::tuple<time_t ,size_t ,std::string,std::string, T>& data) {
+        ++count;
+        if(std::is_same<T,int>::value){
+            sound_values.push_back(data);
+        }else if(std::is_same<T,bool>::value){
+            light_values.push_back(data);
+        }else if("Temperature" == std::get<3>(data)){
+            temperature_values.push_back(data);
+        }else{
+            humidity_values.push_back(data);
+        }
     }
+    void useData();
     void enableFileLog();
     void disableFileLog();
 };
