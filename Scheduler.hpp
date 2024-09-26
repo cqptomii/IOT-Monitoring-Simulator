@@ -13,6 +13,9 @@
 #include <memory>
 #include <list>
 #include <thread>
+#include <atomic>
+
+#define NB_THREADS_SCHEDULER 4
 
 class Scheduler {
 private:
@@ -26,13 +29,14 @@ private:
     unsigned int interval;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_update;
 
-    bool is_running;
-    std::thread thread_test;
+    std::atomic<bool> is_running;
+    std::vector<std::thread> thread_tasks;
     /**
      * @brief methode qui organise le sequencement des capteurs. Permet d'appeler la fonction update sur l'ensemble des capteurs enregistré dans le scheduler
      *
      */
-    void simulation();
+    void simulation(unsigned int thread_id);
+    void runTasks(unsigned int thread_id);
     void linkServer(const std::shared_ptr<Server>& server);
     void linkSensor(std::unique_ptr<Sound> sound_sensor);
     void linkSensor(std::unique_ptr<Humidity> hum_sensor);
@@ -73,7 +77,6 @@ public:
     void operator<<(const Temperature& sensor);
 
 
-    void runTasks();
     bool start();
     void stop();
 };

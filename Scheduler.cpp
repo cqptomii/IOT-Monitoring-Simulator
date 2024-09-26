@@ -6,12 +6,13 @@
 
 Scheduler::Scheduler() : server_ptr(),l_sensor(),s_sensor(),h_sensor(),t_sensor(),interval(5000),is_running(false), last_update(){}
 
-Scheduler::Scheduler(const Scheduler &scheduler) : interval(scheduler.interval),last_update(scheduler.last_update),is_running(scheduler.is_running) {
+Scheduler::Scheduler(const Scheduler &scheduler) : interval(scheduler.interval),last_update(scheduler.last_update) {
     if(scheduler.server_ptr){
         this->server_ptr = scheduler.server_ptr;
     }else{
         this->server_ptr.reset();
     }
+    is_running.store(scheduler.is_running);
     for(const std::unique_ptr<Sound> &tempS : scheduler.s_sensor){
         this->s_sensor.push_back(std::make_unique<Sound>(*tempS));
     }
@@ -34,7 +35,7 @@ Scheduler &Scheduler::operator=(const Scheduler& scheduler){
             this->server_ptr.reset();
 
         this->last_update = scheduler.last_update;
-        this->is_running = scheduler.is_running;
+        this->is_running.store(scheduler.is_running);
 
         for(const std::unique_ptr<Sound> &tempS : scheduler.s_sensor){
             this->s_sensor.push_back(std::make_unique<Sound>(*tempS));
@@ -94,28 +95,44 @@ void Scheduler::linkSensor(std::unique_ptr<Light> light_sensor) {
     this->l_sensor.push_back(std::move(light_sensor));
 }
 
-void Scheduler::simulation() {
+void Scheduler::simulation(unsigned int thread_id) {
     if(isReady()){
-        std::cout << "Lecture des valeurs des capteurs" << std::endl;
-        last_update = std::chrono::high_resolution_clock::now();
-        for(const std::unique_ptr<Light> &l : this->l_sensor){
-            l->update();
-        }
-        for(const std::unique_ptr<Sound> &s : this->s_sensor){
-            s->update();
-        }
-        for(const std::unique_ptr<Humidity> &h : this->h_sensor){
-            h->update();
-        }
-        for(const std::unique_ptr<Temperature> &t : this->t_sensor){
-            t->update();
+        switch (thread_id) {
+            case 5: {
+                last_update = std::chrono::high_resolution_clock::now();
+                for (const std::unique_ptr<Light> &l: this->l_sensor) {
+                    l->update();
+                }
+                break;
+            }
+            case 4:{
+                for(const std::unique_ptr<Sound> &s : this->s_sensor){
+                    s->update();
+                }
+                break;
+            }
+            case 3:{
+                for(const std::unique_ptr<Humidity> &h : this->h_sensor){
+                    h->update();
+                }
+                break;
+            }
+            case 2:{
+                for(const std::unique_ptr<Temperature> &t : this->t_sensor){
+                    t->update();
+                }
+                break;
+            }
+            default:
+                std::cerr << "Thread non reconnue " << std::this_thread::get_id()  << " " <<thread_id<< std::endl;
+                break;
         }
     }
 }
-void Scheduler::runTasks() {
+void Scheduler::runTasks(unsigned int thread_id) {
     try {
         while (is_running) {
-            simulation();
+            simulation(thread_id);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }catch(std::exception& e){
@@ -123,25 +140,39 @@ void Scheduler::runTasks() {
     }
 }
 bool Scheduler::start() {
-    is_running = true;
     if(!this->server_ptr){
         std::cerr<< "ERROR - pas de server associe au scheduler" << std::endl;
         return false;
     }
-    /*
     if(is_running){
         return true;
     }
-     */
-    runTasks();
+    is_running = true;
+    for(int i = 1; i<=NB_THREADS_SCHEDULER;++i){
+        thread_tasks.emplace_back([this, &i]{
+            runTasks(i);
+        });
+    }
+    thread_tasks.emplace_back([this]{
+        while(is_running){
+            this->server_ptr->useData();
+            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        }
+    });
+
     return true;
 }
 
 void Scheduler::stop() {
-    is_running = false;
-    if(thread_test.joinable()){
-        thread_test.join(); // arrêt du thread
+    is_running.store(false);
+
+    for(std::thread& t : this->thread_tasks){
+        if(t.joinable()){
+            t.join();
+        }
     }
+
+    thread_tasks.clear();
 }
 
 bool Scheduler::isReady() {
