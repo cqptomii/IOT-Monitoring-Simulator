@@ -83,7 +83,7 @@ public:
     /**
      * @brief Constructeur par default de la classe Sensor
      */
-    Sensor() : name("sensor"),read_interval(1000),data(0),type("default"),ID(0),associed_server(nullptr){
+    Sensor() : name("sensor"),read_interval(1000),data(),type("default"),ID(),associed_server(nullptr){
         this->last_read = std::chrono::high_resolution_clock::now();
     }
     /**

@@ -11,7 +11,7 @@
 #include <string>
 class Server {
 private:
-    std::filesystem::path server_log_file;
+    std::filesystem::path server_log_path;
     bool file_logs;
     bool console_logs;
     std::time_t current_time;
@@ -42,12 +42,12 @@ private:
      */
     template<typename T>
     void writting_format(std::ostream& os,const std::tuple<size_t ,std::string,std::string, T> &data){
-         current_time = time(nullptr);
-         std::string str_time = ctime(&current_time);
+        current_time = time(nullptr);
+        std::string str_time = ctime(&current_time);
 
-         str_time.pop_back(); // supprime le "\n"
+        str_time.pop_back(); // supprime le "\n"
 
-         os << str_time << " " << // current Time
+        os << str_time << " " << // current Time
                    std::get<0>(data) << " " << // Sensor ID
                    std::get<1>(data) << " " << // Sensor Type
                    std::get<2>(data) << " " << // Senor name
@@ -59,29 +59,29 @@ private:
      */
     template<typename T>
     void writeData(const std::tuple<size_t ,std::string,std::string, T> &data){
-        bool file_exist(true);
-
         if(console_logs){
             consoleWrite(data);
         }
         if(file_logs){
+            bool file_exist(true);
             // Création du dossier log server si non existant
-            if(!std::filesystem::exists(server_log_file.string())){
-                if(!std::filesystem::create_directories(server_log_file)){
+            if(!std::filesystem::exists(server_log_path)){
+                std::cout << "Dossier inexistant : creation du dossier parent" << std::endl;
+                if(!std::filesystem::create_directories(server_log_path)){
                     std::cerr << "Erreur lors de la creation du dossier" << std::endl;
                 }
             }
 
-            std::string sensor_logs_folder = server_log_file.string() + "/" + std::get<1>(data)[0] + "_" + std::get<2>(data);
+            std::string sensor_logs_folder =(server_log_path / (std::get<1>(data) + "_" + std::get<2>(data) + ".txt")).string();
+            std::cout << sensor_logs_folder;
             // Creation du fichier log associé au capteur si non existant
             try {
                 if(!std::filesystem::exists(sensor_logs_folder)){
                     file_exist = false;
                 }
-                std::ofstream log(sensor_logs_folder);
+                std::ofstream log(sensor_logs_folder, std::ofstream::out | std::ofstream::app);
 
                 log.exceptions(std::ofstream::failbit | std::ofstream::badbit); // active les exceptions failbit / badbit
-                log.open(server_log_file, std::ofstream::out | std::ofstream::app);
 
                 if(!file_exist){
                     log << "Date ID Type Name Value" << std::endl;
@@ -90,7 +90,7 @@ private:
 
                 log.close();
             } catch (const std::ofstream::failure &e) {
-                std::cerr << "Erreur lors de l'ouverture du fichier" << std::endl;
+                std::cerr << "Erreur lors de l'ouverture du fichier "<< e.what() << std::endl;
             }
 
 
@@ -117,7 +117,7 @@ public:
     /**
      * @brief Destructeur de la classe Server
      */
-    virtual ~Server() = default;
+    ~Server() = default;
     /**
      * @brief Opérateur d'affectation de la classe Server
      * @param server : le server à recopier
@@ -133,6 +133,8 @@ public:
     void operator<<(const std::tuple<size_t ,std::string,std::string, T>& data) {
         this->writeData(data);
     }
+    void enableFileLog();
+    void disableFileLog();
 };
 
 
