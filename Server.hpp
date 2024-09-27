@@ -9,7 +9,7 @@
 #include <fstream>
 #include <ctime>
 #include <string>
-#include <vector>
+#include <list>
 
 class Server {
 private:
@@ -21,10 +21,10 @@ private:
     unsigned int count;
 
     // Conteneur permettant au server de stocker les valeurs reçu par les capteurs
-    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, float>> temperature_values;
-    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, float>> humidity_values;
-    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, int>> sound_values;
-    std::vector<std::tuple<time_t ,size_t ,std::string,std::string, bool>> light_values;
+    std::list<std::tuple<time_t ,size_t ,std::string,std::string, float>> temperature_values;
+    std::list<std::tuple<time_t ,size_t ,std::string,std::string, float>> humidity_values;
+    std::list<std::tuple<time_t ,size_t ,std::string,std::string, int>> sound_values;
+    std::list<std::tuple<time_t ,size_t ,std::string,std::string, bool>> light_values;
 
     /**
      * @brief Fonction permettant de visualiser les données reçues des capteurs dans la console
