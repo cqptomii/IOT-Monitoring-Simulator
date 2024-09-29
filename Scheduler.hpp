@@ -31,17 +31,46 @@ private:
 
     std::atomic<bool> is_running;
     std::vector<std::thread> thread_tasks;
+
     /**
-     * @brief methode qui organise le sequencement des capteurs. Permet d'appeler la fonction update sur l'ensemble des capteurs enregistré dans le scheduler
-     *
+     * @brief méthode qui organise le séquencement des capteurs. Permet d'appeler la fonction update sur l'ensemble des capteurs enregistré dans le scheduler
+     * @param thread_id : identifiants des différents threads parcourant cette fonction : permet d'affecter des taches précises à chaque threads
      */
     void simulation(unsigned int thread_id);
+    /**
+     * @brief
+     * @param thread_id : identifiants des différents threads
+     */
     void runTasks(unsigned int thread_id);
+    /**
+     * @brief méthode qui permet d'associer un Server à notre Scheduler
+     * @param server : pointeur partagée vers le server
+     */
     void linkServer(const std::shared_ptr<Server>& server);
+    /**
+     * @brief méthode qui permet d'ajouter un capteur de son dans la liste du Scheduler
+     * @param sound_sensor : pointeur unique vers le capteur de son
+     */
     void linkSensor(std::unique_ptr<Sound> sound_sensor);
+    /**
+     * @brief méthode qui permet d'ajouter un capteur d'humidité dans la liste du Scheduler
+     * @param hum_sensor : pointeur unique vers le capteur d'humidité
+     */
     void linkSensor(std::unique_ptr<Humidity> hum_sensor);
+    /**
+     * @brief méthode qui permet d'ajouter un capteur de temperature dans la liste du Scheduler
+     * @param temp_sensor : pointeur unique vers le capteur de temperature
+     */
     void linkSensor(std::unique_ptr<Temperature> temp_sensor);
+    /**
+     * @brief méthode qui permet d'ajouter un capteur de lumière dans la liste du Scheduler
+     * @param light_sensor : pointeur unique vers le capteur de lumière
+     */
     void linkSensor(std::unique_ptr<Light> light_sensor);
+    /**
+     * @brief méthode permettant de savoir si le Scheduler est prêt à envoyer une requête aux capteurs
+     * @return true / false
+     */
     bool isReady();
 public:
     /**
@@ -67,17 +96,39 @@ public:
        */
     Scheduler& operator=(const Scheduler& scheduler);
     /**
-     * @brief Suchage opérateur de sortie permettant d'envoyer au scheduler un server
+     * @brief Surcharge opérateur de sortie permettant d'envoyer au scheduler un server
      * @param server : server transmis au scheduler
      */
     void operator<<(const Server& server);
+    /**
+     * @brief Surcharge opérateur de sortie permettant d'envoyer au scheduler un capteur de son
+     * @param sensor : capteur de son transmis au scheduler
+     */
     void operator<<(const Sound& sensor);
+    /**
+     * @brief Surcharge opérateur de sortie permettant d'envoyer au scheduler un capteur de lumière
+     * @param sensor : capteur de lumière transmis au scheduler
+     */
     void operator<<(const Light& sensor);
+    /**
+     * @brief Surcharge opérateur de sortie permettant d'envoyer au scheduler un capteur d'humidité
+     * @param sensor : capteur d'humidité transmis au scheduler
+     */
     void operator<<(const Humidity& sensor);
+    /**
+     * @brief Sucharge opérateur de sortie permettant d'envoyer au scheduler un capteur de température
+     * @param sensor : capteur de temperature transmis au scheduler
+     */
     void operator<<(const Temperature& sensor);
 
-
+    /**
+     * @brief méthode qui permet de lancer la simulation par le Scheduler
+     * @return true / false
+     */
     bool start();
+    /**
+     * @brief méthode qui permet d'arreter la simulation
+     */
     void stop();
 };
 

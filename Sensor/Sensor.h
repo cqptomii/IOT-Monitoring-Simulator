@@ -21,9 +21,9 @@ private:
 
     unsigned int read_interval;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_read;
+
     /**
-     * @brief permet de generer une valeur aleatoire en fonction du type de donnée du capteur
-     * @return valeur aléatoire d'un type donné
+     * @brief méthode virtuelle pure qui permet de générer une valeur aléatoire en fonction du type de capteur
      */
     virtual void readValue() = 0;
     /**
@@ -39,8 +39,8 @@ private:
         return false;
     }
     /**
-     * @brief
-     * @return
+     * @brief méthode qui vérifie si le capteur est prêt à lire une donnée
+     * @return vrai si oui, faux sinon
      */
     bool isReady(){
         std::chrono::time_point<std::chrono::high_resolution_clock > currentTime = std::chrono::high_resolution_clock::now();
@@ -64,8 +64,7 @@ protected:
     }
 
     /**
-     * @brief permet de generer une identifiant unique alétoire
-     * @return identifiant
+     * @brief permet de générer une identifiant unique aléatoire avec l'aide de la bibliothèque random
      */
     void generateId(){
         std::string id_unhashed = this->type;
@@ -110,8 +109,8 @@ public:
     virtual ~Sensor() = default ;
     /**
      * @brief Opérateur de copie de la classe Sensor
-     *
      * @param sensor : capteur à copier
+     * @return référence vers la copie du capteur
      */
      Sensor &operator=(const Sensor& sensor){
         if(this != &sensor){
@@ -123,6 +122,10 @@ public:
         }
         return *this;
     }
+    /**
+     * @brief méthode qui permet de configurer l'interval propre de chaque capteur
+     * @param interval : interval modifié
+     */
     void setIntervalRead(unsigned int interval){
         if(interval >=1000){
             this->read_interval = interval;

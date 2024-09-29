@@ -28,7 +28,7 @@ private:
 
     /**
      * @brief Fonction permettant de visualiser les données reçues des capteurs dans la console
-     * @param data : Tuple contenant les données à ecrire dans la console de logs
+     * @param data : Tuple contenant les données à écrire dans la console de logs
      */
     template<typename T>
     void consoleWrite(const std::tuple<time_t ,size_t ,std::string,std::string, T>& data){
@@ -46,9 +46,10 @@ private:
     }
 
     /**
-     * @brief write_data
-     * @param os :
-     * @param data :
+     * @brief affiche le paquet de données transmis par le capteurs dans l'ostream fournis selon un format prédéfinis :
+     *       Date ID Type Nom Valeur
+     * @param os : sortie vers laquelle les données sont écrites
+     * @param data : paquets de données transmis qui doit être écrit
      */
     template<typename T>
     void writting_format(std::ostream& os,const std::tuple<time_t ,size_t ,std::string,std::string, T> &data){
@@ -64,7 +65,9 @@ private:
     }
 
     /**
-     * @brief write_data
+     * @brief Methode appelant les différentes fonctions d'écriture de log selon les configurations du Server
+     *
+     * @param data : paquet de données transmis par le capteurs
      */
     template<typename T>
     void writeData(const std::tuple<time_t ,size_t ,std::string,std::string, T> &data){
@@ -151,8 +154,18 @@ public:
             humidity_values.push_back(data);
         }
     }
+    /**
+     * @brief Fonction qui demande au server d'afficher les données dans les sorties log.
+     * L'affichage des données est gérer par le server : il choisit si il doit ou non afficher les données
+     */
     void useData();
+    /**
+     * @brief Setter de l'attribut file_logs : permet d'activer l'écriture de log dans des fichiers annexes
+     */
     void enableFileLog();
+    /**
+     * @brief Setter de l'attribut file_logs : permet de désactiver l'écriture de log dans les fichiers annexes
+     */
     void disableFileLog();
 };
 
