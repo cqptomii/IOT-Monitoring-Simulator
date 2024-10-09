@@ -17,4 +17,6 @@ add_executable(TP main.cpp
         Sensor/Sound.cpp
         Sensor/Humidity.hpp
         Sensor/Humidity.cpp
+        Barrier.hpp
+        Barrier.cpp
 )

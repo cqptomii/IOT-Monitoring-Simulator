@@ -14,8 +14,7 @@
 #include <list>
 #include <thread>
 #include <atomic>
-
-#define NB_THREADS_SCHEDULER 4
+#include "Barrier.hpp"
 
 class Scheduler {
 private:
@@ -28,9 +27,11 @@ private:
 
     unsigned int interval;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_update;
-
     std::atomic<bool> is_running;
+
+    unsigned int thread_amount = 1;
     std::vector<std::thread> thread_tasks;
+    std::unique_ptr<Barrier> scheduler_barrier;
 
     /**
      * @brief méthode qui organise le séquencement des capteurs. Permet d'appeler la fonction update sur l'ensemble des capteurs enregistré dans le scheduler
@@ -42,6 +43,11 @@ private:
      * @param thread_id : identifiants des différents threads
      */
     void runTasks(unsigned int thread_id);
+    /**
+     * @brief méthode qui appel la fonction update sur une des listes de capteurs en fonctions de de la variable thread-id
+     * @param thread_id : identifiants des différents threads
+     */
+    void updateList(unsigned int thread_id);
     /**
      * @brief méthode qui permet d'associer un Server à notre Scheduler
      * @param server : pointeur partagée vers le server

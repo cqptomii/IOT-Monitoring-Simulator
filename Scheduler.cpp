@@ -94,39 +94,52 @@ void Scheduler::linkSensor(std::unique_ptr<Light> light_sensor) {
     light_sensor->associed_server = this->server_ptr;
     this->l_sensor.push_back(std::move(light_sensor));
 }
-
+void Scheduler::updateList(unsigned int thread_id){
+    switch (thread_id) {
+        case 1: {
+            for (const std::unique_ptr<Light> &l: this->l_sensor) {
+                l->update();
+            }
+            break;
+        }
+        case 2:{
+            for(const std::unique_ptr<Sound> &s : this->s_sensor){
+                s->update();
+            }
+            break;
+        }
+        case 3:{
+            for(const std::unique_ptr<Humidity> &h : this->h_sensor){
+                h->update();
+            }
+            break;
+        }
+        case 4:{
+            for(const std::unique_ptr<Temperature> &t : this->t_sensor){
+                t->update();
+            }
+            break;
+        }
+        default:
+            std::cerr << "Thread non reconnue " << std::this_thread::get_id()  << " " <<thread_id<< std::endl;
+            break;
+    }
+}
 void Scheduler::simulation(unsigned int thread_id) {
     if(isReady()){
-        switch (thread_id) {
-            case 5: {
-                last_update = std::chrono::high_resolution_clock::now();
-                for (const std::unique_ptr<Light> &l: this->l_sensor) {
-                    l->update();
-                }
-                break;
-            }
-            case 4:{
-                for(const std::unique_ptr<Sound> &s : this->s_sensor){
-                    s->update();
-                }
-                break;
-            }
-            case 3:{
-                for(const std::unique_ptr<Humidity> &h : this->h_sensor){
-                    h->update();
-                }
-                break;
-            }
-            case 2:{
-                for(const std::unique_ptr<Temperature> &t : this->t_sensor){
-                    t->update();
-                }
-                break;
-            }
-            default:
-                std::cerr << "Thread non reconnue " << std::this_thread::get_id()  << " " <<thread_id<< std::endl;
-                break;
-        }
+        if(thread_amount == 3){ // Si on ne dispose que de 3 threads un unique thread met à jour les listes
+            updateList(1);
+            updateList(2);
+            updateList(3);
+            updateList(4);
+        }else
+            updateList(thread_id);  // Sinon chacun des 4 threads met à jour une des listes de capteurs selon son identifiant
+
+        //Synchronisation de tous les threads à la barrière avant de rafraichir le timer
+        scheduler_barrier->wait();
+        // if statement to ensure that the timer is updated once
+        if(thread_id == 1)
+            last_update = std::chrono::high_resolution_clock::now();
     }
 }
 void Scheduler::runTasks(unsigned int thread_id) {
@@ -144,13 +157,22 @@ bool Scheduler::start() {
         std::cerr<< "ERROR - pas de server associe au scheduler" << std::endl;
         return false;
     }
-    if(is_running){
+    if(is_running) {
         return true;
     }
+    if(this->thread_amount < 3) // Minimal multithreading implementation statement
+        thread_amount = 3;
+    else if(this->thread_amount > 6) // General multithreading implementation statement
+        thread_amount = 6;
+
+    // initialisation de la Barrier pour synchroniser les threads gérant les capteurs
+    this->scheduler_barrier = std::make_unique<Barrier>(thread_amount-2);
+
     is_running = true;
-    for(int i = 1; i<=NB_THREADS_SCHEDULER;++i){
-        thread_tasks.emplace_back([this, &i]{
-            runTasks(i);
+    for(int i = 1; i<=thread_amount - 2;++i){
+        int currentID = i;
+        thread_tasks.emplace_back([this,currentID]{
+            runTasks(currentID);
         });
     }
     thread_tasks.emplace_back([this]{

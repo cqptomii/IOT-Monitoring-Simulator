@@ -35,7 +35,10 @@ void Server::disableFileLog() {
 }
 void Server::useData() {
     if(count>=interval){
-        std::cout << " Affichage des dernières données obtenues : " << std::endl << std::endl;
+        if(this->file_logs)
+            std::cout << "Sauvegardes des données dans les fichiers" << std::endl;
+        if(this->console_logs)
+            std::cout << " Affichage des dernières données obtenues : " << std::endl << std::endl;
 
        for(const auto & temperature_value : temperature_values){
            writeData(temperature_value);
