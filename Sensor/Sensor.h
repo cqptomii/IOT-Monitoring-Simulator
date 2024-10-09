@@ -78,11 +78,22 @@ protected:
         this->ID = hash_id(id_unhashed);
     }
 
+    /**
+     * @brief méthode permettant de générer l'interval de lecture des capteurs de manière aléatoire selon l'ordre de grandeur donnée
+     * @param
+     */
+     void generateInterval(int min, int max){
+         std::random_device rd;
+         std::default_random_engine generator(rd());
+         std::uniform_int_distribution<> distribution(min,max);
+         this->read_interval = distribution(generator);
+     }
+
 public:
     /**
      * @brief Constructeur par default de la classe Sensor
      */
-    Sensor() : name("sensor"),read_interval(1000),data(),type("default"),ID(),associed_server(nullptr){
+    Sensor() : name("sensor"),read_interval(generateInterval(1000,2000)),data(),type("default"),ID(),associed_server(nullptr){
         this->last_read = std::chrono::high_resolution_clock::now();
     }
     /**
