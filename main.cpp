@@ -1,10 +1,29 @@
 #include <iostream>
 #include "Scheduler.hpp"
 
-int main() {
+int main(int argc,char *argv[]) {
     bool console_log = false, file_log = false, add = true;
     char temp;
-
+    std::string argument;
+    for (int i = 1; i < argc; i++) {
+        argument = argv[i];
+        if (argument == "-l" || argument == "--log") {
+            file_log = true;
+        } else if (argument == "-c" || argument == "--console") {
+            console_log = true;
+        } else if (argument == "-v" || argument == "--version") {
+            std::cout << "AP4A Project - v1.0" << std::endl;
+            std::cout << "Compilation date : " << __DATE__ << " " << __TIME__ << std::endl;
+            return 0;
+        } else if (argument == "-h" || argument == "--help") {
+            std::cout << "Usage : " << argv[0] << " [options]\n\n"
+                      << "Options : -h, --help      Print this help manual.\n"
+                      << "          -v, --version   Print program's version and compilation date.\n"
+                      << "          -l, --log       Turn on writing on log file.\n"
+                      << "          -c, --console   Turn on console writing." << std::endl;
+            return 0;
+        }
+    }
     std::cout << "---" << std::endl << "Bienvenue sur le simulateur IOT" << std::endl << "---" << std::endl;
 
     Scheduler Mainprocess;
