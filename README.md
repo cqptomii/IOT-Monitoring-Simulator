@@ -28,8 +28,12 @@ PROCESSUS == CAPTEURS
  - Server
     - Capacité à stocker des informations sous formes de logs que l'on peut partager dans une console
     - Capacité à recevoir des informations des différents capteurs
-    - gestion du temps interne de chaque capteur
-   
+    - gestion du temps interne de chaque capteur à traver 
+
+Format nom de fichier logs : ServerName/Type_nom.txt  ---- EX: Server1/H_cuisine.txt
+
+Mise en forme ecriture console ->  Date ID Type Name Data 
+
 Amelioration server : donner un rôle actif au server par exemple envoie de message selon la valeur de retour des capteurs
     ou monitoring de l'espace : donner des instructions en fonction des données reçus pour optimiser l'environnement de la pièce
 
@@ -41,7 +45,7 @@ Amelioration server : donner un rôle actif au server par exemple envoie de mess
     - un nom de capteurs -> logs personnalisés
  
     - Fonction update -> comportement dynamique du capteur executée par l'ordonnanceur suivant une base de temps prédefinis
-    - Fonction execute -> met à jour la valeur mesurée par le capteur selon une certaine base de temps enhérente au capteur.
+    - Fonction execute -> met à jour la valeur mesurée par le capteur selon une certaine base de temps inhérente au capteur.
  puis l'envoie au serveur. (Simulation de la lecture d'une valeur par le capteur avec de l'aléatoire : lib random c++)
     - Génération de données de plusieurs types différents - en fonction du capteur
        -> Classe data Générique
@@ -53,3 +57,5 @@ Amelioration server : donner un rôle actif au server par exemple envoie de mess
    - Chaque processus gère son comportement selon son propre temps interne spécifique aux capteurs
     
    - Fonction simulation qui organise le sequencement de l'execution des processus -> permet au capteurs de récuperer les informations de mesure et de les retourner au serveur dédié
+
+Amelioration : Donner un ordre d'importance dans la lecture des capteurs dans le server

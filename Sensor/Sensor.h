@@ -82,11 +82,11 @@ protected:
      * @brief méthode permettant de générer l'interval de lecture des capteurs de manière aléatoire selon l'ordre de grandeur donnée
      * @param
      */
-     void generateInterval(int min, int max){
+     int generateInterval(int min, int max){
          std::random_device rd;
          std::default_random_engine generator(rd());
          std::uniform_int_distribution<> distribution(min,max);
-         this->read_interval = distribution(generator);
+         return distribution(generator);
      }
 
 public:
