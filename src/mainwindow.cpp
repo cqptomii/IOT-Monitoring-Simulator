@@ -253,17 +253,25 @@ void MainWindow::deleteSensorClicked(){
             this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant de supprimer un capteur");
             return;
         }
-        switch(this->sensor_add_type){
+        switch(this->sensor_delete_type){
             case 1 :{
+                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Temperature"))
+                    this->t_count--;
                 break;
             }
             case 2:{
+                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Humidity"))
+                    this->h_count--;
                 break;
             }
             case 3:{
+                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Sound"))
+                    this->s_count--;
                 break;
             }
             case 4:{
+                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Ligth"))
+                    this->l_count--;
                 break;
             }
         }
@@ -334,17 +342,17 @@ void MainWindow::onToggleButtondelete(bool checked){
 
     if(tempButton){
         if (tempButton->text() == "Temperature ") {
-            this->sensor_add_type = 1;
+            this->sensor_delete_type = 1;
         } else if (tempButton->text() == "Humidité ") {
-            this->sensor_add_type = 2;
+            this->sensor_delete_type = 2;
         } else if (tempButton->text() == "Son ") {
-            this->sensor_add_type = 3;
+            this->sensor_delete_type = 3;
         } else if (tempButton->text() == "Lumière ") {
-            this->sensor_add_type = 4;
+            this->sensor_delete_type = 4;
         }
     }
 }
-void MainWindow::update_Arrow(unsigned int sensor_type){
+void MainWindow::update_Arrow(unsigned int sensor_type,bool server){
     QPoint first_sensor = this->sensor_diagram->get_firstSensor_pos();
     QPoint space = this->sensor_diagram->get_sensor_space();
     QPoint heigth = this->sensor_diagram->get_ellipse_heigth();
@@ -352,30 +360,34 @@ void MainWindow::update_Arrow(unsigned int sensor_type){
     switch(sensor_type){
         case 1:{ // Temperature
             this->sensor_diagram->add_scheduler_Arrow(first_sensor,"t");
-            QTimer::singleShot(500,this,[this,first_sensor,heigth](){
-                this->sensor_diagram->add_server_Arrow(first_sensor + heigth,"t");
-            });
+            if(server)
+                QTimer::singleShot(500,this,[this,first_sensor,heigth](){
+                    this->sensor_diagram->add_server_Arrow(first_sensor + heigth,"t");
+                });
             break;
         }
         case 2:{ // Humidité
             this->sensor_diagram->add_scheduler_Arrow(first_sensor + space,"h");
-            QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
-                this->sensor_diagram->add_server_Arrow(first_sensor + space + heigth,"h");
-            });
+            if(server)
+                QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
+                    this->sensor_diagram->add_server_Arrow(first_sensor + space + heigth,"h");
+                });
             break;
         }
         case 3:{ // Son
             this->sensor_diagram->add_scheduler_Arrow(first_sensor + 2*space,"s");
-            QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
-               this->sensor_diagram->add_server_Arrow(first_sensor + 2*(space) + heigth,"s");
-            });
+            if(server)
+                QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
+                   this->sensor_diagram->add_server_Arrow(first_sensor + 2*(space) + heigth,"s");
+                });
             break;
         }
         case 4:{ // Lumière
             this->sensor_diagram->add_scheduler_Arrow(first_sensor + 3*space,"l");
-            QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
-                this->sensor_diagram->add_server_Arrow(first_sensor + 3*(space) + heigth,"l");
-            });
+            if(server)
+                QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
+                    this->sensor_diagram->add_server_Arrow(first_sensor + 3*(space) + heigth,"l");
+                });
             break;
         }
     }

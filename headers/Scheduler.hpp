@@ -81,7 +81,7 @@ private:
      * @return true / false
      */
     bool isReady();
-    void UpdateSensorDisplay(unsigned int sensor_type);
+    void UpdateSensorDisplay(unsigned int sensor_type,bool server);
     void send_message_to_window(const QString& s);
 public:
 
@@ -133,6 +133,7 @@ public:
      */
     void operator<<(const Temperature& sensor);
 
+    bool remove_sensor(const std::string name,const std::string type);
     /**
      * @brief méthode qui permet de lancer la simulation par le Scheduler
      * @return true / false
@@ -143,7 +144,7 @@ public:
      */
     void stop();
 signals:
-    void drawArrow(unsigned int sensor_type);
+    void drawArrow(unsigned int sensor_type,bool server);
     void send_message(const QString &s);
 };
 

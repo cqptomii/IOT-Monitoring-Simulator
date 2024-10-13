@@ -29,7 +29,6 @@ void Scheduler::linkServer(Server *server) {
         send_message_to_window("Ajout du server au Scheduler");
     }
 }
-
 void Scheduler::linkSensor(std::unique_ptr<Sound> sound_sensor) {
     sound_sensor->associed_server = this->server_ptr;
     this->s_sensor.push_back(std::move(sound_sensor));
@@ -59,27 +58,47 @@ void Scheduler::updateList(unsigned int thread_id){
     qDebug() << "envoie des données vers le server";
     switch (thread_id) {
         case 1: {
-            for (const std::unique_ptr<Light> &l: this->l_sensor) {
-                l->update();
+            if(t_sensor.size() == 0){
+                UpdateSensorDisplay(1,false);
+                break;
             }
+            for (const std::unique_ptr<Temperature> &t: this->t_sensor) {
+                t->update();
+            }
+            UpdateSensorDisplay(1,true);
             break;
         }
         case 2:{
-            for(const std::unique_ptr<Sound> &s : this->s_sensor){
-                s->update();
+            if(h_sensor.size() == 0){
+                UpdateSensorDisplay(2,false);
+                break;
             }
-            break;
-        }
-        case 3:{
             for(const std::unique_ptr<Humidity> &h : this->h_sensor){
                 h->update();
             }
+            UpdateSensorDisplay(2,true);
+            break;
+        }
+        case 3:{
+            if(s_sensor.size() == 0){
+                UpdateSensorDisplay(3,false);
+                break;
+            }
+            for(const std::unique_ptr<Sound> &s : this->s_sensor){
+                s->update();
+            }
+            UpdateSensorDisplay(3,true);
             break;
         }
         case 4:{
-            for(const std::unique_ptr<Temperature> &t : this->t_sensor){
-                t->update();
+            if(l_sensor.size() == 0){
+                UpdateSensorDisplay(4,false);
+                break;
             }
+            for(const std::unique_ptr<Light> &l : this->l_sensor){
+                l->update();
+            }
+            UpdateSensorDisplay(4,true);
             break;
         }
         default:
@@ -92,16 +111,11 @@ void Scheduler::simulation(unsigned int thread_id) {
         qDebug() << "Read sensor Data";
         if(thread_amount == 3){ // Si on ne dispose que de 3 threads un unique thread met à jour les listes
             updateList(1);
-            UpdateSensorDisplay(1);
             updateList(2);
-            UpdateSensorDisplay(2);
             updateList(3);
-            UpdateSensorDisplay(3);
             updateList(4);
-            UpdateSensorDisplay(4);
         }else{
             updateList(thread_id);  // Sinon chacun des 4 threads met à jour une des listes de capteurs selon son identifiant
-            UpdateSensorDisplay(thread_id);
         }
         //Synchronisation de tous les threads à la barrière avant de rafraichir le timer
         scheduler_barrier->wait();
@@ -116,7 +130,7 @@ void Scheduler::runTasks(unsigned int thread_id) {
     try {
         while (is_running) {
             simulation(thread_id);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }catch(std::exception& e){
         qDebug() << "Exception dans le thread - Fin du thread";
@@ -178,9 +192,50 @@ bool Scheduler::isReady() {
 Scheduler::~Scheduler() {
     stop();
 }
+bool Scheduler::remove_sensor(const std::string name,const std::string type){
+    if(type == "Temperature"){
+        auto it = std::remove_if(t_sensor.begin(), t_sensor.end(),
+                                      [&name](const std::unique_ptr<Temperature>& sensor) {
+                                          return sensor->name == name; // Si sensor name est bien le nom d'un capteur
+                                      });
+        if(it != t_sensor.end()){
+            t_sensor.erase(it,t_sensor.end());
+            return true;
+        }
+    }else if(type == "Humidity"){
+        auto it = std::remove_if(h_sensor.begin(), h_sensor.end(),
+                                      [&name](const std::unique_ptr<Humidity>& sensor) {
+                                          return sensor->name == name; // Si sensor name est bien le nom d'un capteur
+                                      });
+        if (it != h_sensor.end()) {
+            h_sensor.erase(it, h_sensor.end());
+            return true;
+        }
+    }else if(type == "Sound"){
+       auto it = std::remove_if(s_sensor.begin(), s_sensor.end(),
+                                      [&name](const std::unique_ptr<Sound>& sensor) {
+                                          return sensor->name == name; // Si sensor name est bien le nom d'un capteur
+                                      });
+        if (it != s_sensor.end()) {
+            s_sensor.erase(it, s_sensor.end());
+            return true;
+        }
+    }else if(type == "Ligth"){
+        auto it = std::remove_if(l_sensor.begin(), l_sensor.end(),
+                                      [&name](const std::unique_ptr<Light>& sensor) {
+                                          return sensor->name == name; // Si sensor name est bien le nom d'un capteur
+                                      });
+        if (it != l_sensor.end()) {
+            l_sensor.erase(it, l_sensor.end());
+            return true;
+        }
 
-void Scheduler::UpdateSensorDisplay(unsigned int sensor_type){
-    emit drawArrow(sensor_type);
+    }
+    return false;
+}
+
+void Scheduler::UpdateSensorDisplay(unsigned int sensor_type,bool server){
+    emit drawArrow(sensor_type,server);
 }
 void Scheduler::send_message_to_window(const QString &s){
     emit send_message(s);

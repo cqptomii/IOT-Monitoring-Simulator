@@ -29,7 +29,7 @@ private slots:
     void onToggleButtondelete(bool checked);
     void update_add_name(const QString &s);
     void update_delete_name(const QString &s);
-    void update_Arrow(unsigned int sensor_type);
+    void update_Arrow(unsigned int sensor_type,bool server);
     void print_data(const QString &data);
     void recieve_scheduler_message(const QString &message);
 private:
