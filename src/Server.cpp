@@ -20,27 +20,15 @@ Server &Server::operator=(const Server& server) {
     return *this;
 }*/
 
-void Server::enableFileLog() {
-    if(this->file_logs)
+void Server::setFileLog(bool check) {
+    if(this->file_logs == check)
         return;
-
-    this->file_logs = true;
+    this->file_logs = check;
 }
-void Server::disableFileLog() {
-    if(!this->file_logs)
+void Server::setConsoleLog(bool check){
+    if(this->console_logs == check)
         return;
-
-    this->file_logs = false;
-}
-void Server::enableConsoleLog(){
-    if(this->console_logs)
-        return;
-    this->console_logs = true;
-}
-void Server::disableConsoleLog(){
-    if(!this->console_logs)
-        return;
-    this->console_logs = false;
+    this->console_logs = check;
 }
 void Server::useData() {
     if(count>=interval){

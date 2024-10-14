@@ -1,10 +1,4 @@
 #include "headers/mainwindow.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QScrollArea>
-#include <QLabel>
-#include <QGroupBox>
-#include <QLineEdit>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),Mainprocess(new Scheduler(this)),server_process(new Server(this,true,false)){
 
@@ -34,8 +28,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),Mainprocess(new Sc
     console_log->setChecked(true);
     QCheckBox *file_log = new QCheckBox("log fichier",this);
     file_log->setChecked(false);
-    connect(console_log, &QCheckBox::clicked, this, &MainWindow::HandleConsoleLog);
-    connect(file_log, &QCheckBox::clicked, this,&MainWindow::HandleFileLog);
+    connect(console_log, &QCheckBox::clicked, this,[=](bool clicked){
+        handle_log(clicked,true);
+    });
+    connect(file_log, &QCheckBox::clicked, this,[=](bool clicked){
+        handle_log(clicked,false);
+    });
 
 
     ///
@@ -54,19 +52,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),Mainprocess(new Sc
     QLineEdit *nameadd = new QLineEdit(this);
     nameadd->setMaximumWidth(150);
     nameadd->setMaximumHeight(25);
-    connect(nameadd,&QLineEdit::textChanged,this,&MainWindow::update_add_name);
+    connect(nameadd,&QLineEdit::textChanged,this,[=](const QString &text){
+        update_name(text,true);
+        });
 
     QRadioButton *TempButton = new QRadioButton("Temperature ",this);
     QRadioButton *HumButton = new QRadioButton("Humidité ",this);
     QRadioButton *SoundButton = new QRadioButton("Son ",this);
     QRadioButton *LightButton = new QRadioButton("Lumière ",this);
-    connect(TempButton,&QRadioButton::toggled,this,&MainWindow::onToggleButtonadd);
-    connect(HumButton,&QRadioButton::toggled,this,&MainWindow::onToggleButtonadd);
-    connect(SoundButton,&QRadioButton::toggled,this,&MainWindow::onToggleButtonadd);
-    connect(LightButton,&QRadioButton::toggled,this,&MainWindow::onToggleButtonadd);
+    connect(TempButton,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,true,"Temperature");
+    });
+    connect(HumButton,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,true,"Humidité");
+    });
+    connect(SoundButton,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,true,"Son");
+    });
+    connect(LightButton,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,true,"Lumière");
+    });
 
     QPushButton *pbAdd = new QPushButton("Ajouter",this);
-    connect(pbAdd,&QPushButton::clicked,this,&MainWindow::addSensorClicked);
+    connect(pbAdd,&QPushButton::clicked,this,[=](bool clicked){
+        if(!clicked)
+            sensor_clicked(true);
+    });
 
 
     ///
@@ -95,19 +106,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),Mainprocess(new Sc
     QLineEdit *namedelete = new QLineEdit(this);
     namedelete->setMaximumWidth(150);
     namedelete->setMaximumHeight(25);
-    connect(namedelete,&QLineEdit::textChanged,this,&MainWindow::update_delete_name);
+    connect(nameadd,&QLineEdit::textChanged,this,[=](const QString &text){
+        update_name(text,false);
+    });
 
     QRadioButton *TempButtonD = new QRadioButton("Temperature ", this);
     QRadioButton *HumButtonD = new QRadioButton("Humidité ", this);
     QRadioButton *SoundButtonD = new QRadioButton("Son ", this);
     QRadioButton *LightButtonD = new QRadioButton("Lumière ", this);
-    connect(TempButtonD,&QRadioButton::toggled,this,&MainWindow::onToggleButtondelete);
-    connect(HumButtonD,&QRadioButton::toggled,this,&MainWindow::onToggleButtondelete);
-    connect(SoundButtonD,&QRadioButton::toggled,this,&MainWindow::onToggleButtondelete);
-    connect(LightButtonD,&QRadioButton::toggled,this,&MainWindow::onToggleButtondelete);
+    connect(TempButtonD,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,false,"Temperature");
+    });
+    connect(HumButtonD,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,false,"Humidité");
+    });
+    connect(SoundButtonD,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,false,"Son");
+    });
+    connect(LightButtonD,&QRadioButton::toggled,this,[=](bool check){
+        onToggleButton(check,false,"Lumière");
+    });
 
     QPushButton *pbDelete = new QPushButton("Supprimer", this);
-    connect(pbDelete,&QPushButton::clicked,this,&MainWindow::deleteSensorClicked);
+    connect(pbDelete,&QPushButton::clicked,this,[=](bool clicked){
+        if(!clicked)
+            sensor_clicked(false);
+    });
     ///
     /// gestion du layout delete
     ///
@@ -211,79 +235,74 @@ void MainWindow::onStopButtonClicked(){
     this->is_started = false;
     update();
 }
-void MainWindow::addSensorClicked(){
+void MainWindow::sensor_clicked(bool add){
     if(!is_started){
-        if(this->sensor_add_name == "" || this->sensor_add_type > 4){
-            this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant d'ajouter un capteur");
-            return;
+        if(add){
+            if(this->sensor_add_name == "" || this->sensor_add_type > 4){
+                this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant d'ajouter un capteur");
+                return;
+            }
+        }else{
+            if(this->sensor_delete_name == "" || this->sensor_delete_type > 4){
+                this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant de supprimer un capteur");
+                return;
+            }
         }
         switch(this->sensor_add_type){
             case 1 :{
-                Temperature addT(this->sensor_add_name.toStdString());
-                *Mainprocess << addT;
-                this->t_count++;
+                if(add){
+                    Temperature addT(this->sensor_add_name.toStdString());
+                    *Mainprocess << addT;
+                    this->t_count++;
+                }else{
+                    if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Temperature"))
+                        this->t_count--;
+                }
                 break;
             }
             case 2:{
-
-                Humidity addH(this->sensor_add_name.toStdString());
-                *Mainprocess << addH;
-                this->h_count++;
+                if(add){
+                    Humidity addH(this->sensor_add_name.toStdString());
+                    *Mainprocess << addH;
+                    this->h_count++;
+                }else{
+                    if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Humidity"))
+                        this->h_count--;
+                }
                 break;
             }
             case 3:{
-                Sound addS(this->sensor_add_name.toStdString());
-                *Mainprocess << addS;
-                this->s_count++;
+                if(add){
+                    Sound addS(this->sensor_add_name.toStdString());
+                    *Mainprocess << addS;
+                    this->s_count++;
+                }else{
+                    if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Sound"))
+                        this->s_count--;
+                }
                 break;
             }
             case 4:{
-                Light addL(this->sensor_add_name.toStdString());
-                *Mainprocess << addL;
-                this->l_count++;
+                if(add){
+                    Light addL(this->sensor_add_name.toStdString());
+                    *Mainprocess << addL;
+                    this->l_count++;
+                }else{
+                    if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Ligth"))
+                        this->l_count--;
+                }
                 break;
             }
         }
         this->sensor_diagram->update_sensor_count(t_count,h_count,s_count,l_count);
     }
 }
-void MainWindow::deleteSensorClicked(){
+void MainWindow::handle_log(bool checked,bool console){
     if(!is_started){
-        if(this->sensor_add_name == "" || this->sensor_add_type > 4){
-            this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant de supprimer un capteur");
-            return;
-        }
-        switch(this->sensor_delete_type){
-            case 1 :{
-                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Temperature"))
-                    this->t_count--;
-                break;
-            }
-            case 2:{
-                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Humidity"))
-                    this->h_count--;
-                break;
-            }
-            case 3:{
-                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Sound"))
-                    this->s_count--;
-                break;
-            }
-            case 4:{
-                if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Ligth"))
-                    this->l_count--;
-                break;
-            }
-        }
-        this->sensor_diagram->update_sensor_count(t_count,h_count,s_count,l_count);
-    }
-}
-void MainWindow::HandleConsoleLog(bool checked){
-    if(!is_started){
-        if(checked)
-            this->server_process->enableConsoleLog();
+        if(console)
+            this->server_process->setConsoleLog(checked);
         else
-            this->server_process->disableConsoleLog();
+            this->server_process->setFileLog(checked);
     }else{
         QCheckBox *tempCheck = qobject_cast<QCheckBox*>(sender());
         if (tempCheck) {
@@ -294,61 +313,39 @@ void MainWindow::HandleConsoleLog(bool checked){
         }
     }
 }
-void MainWindow::HandleFileLog(bool checked){
-    if(!is_started){
-        if(checked)
-            this->server_process->enableFileLog();
-        else
-            this->server_process->disableFileLog();
-    }else{
-        QCheckBox *tempCheck = qobject_cast<QCheckBox*>(sender());
-        if (tempCheck) {
-            // Rétablir l'état précédent de la checkbox
-            tempCheck->blockSignals(true);  // Bloquer les signaux pour éviter une boucle infinie
-            tempCheck->setChecked(!checked); // Rétablir l'état précédent
-            tempCheck->blockSignals(false); // Réactiver les signaux
-        }
-    }
+void MainWindow::update_name(const QString &s,bool add){
+    if(add)
+        this->sensor_add_name = s;
+    else
+        this->sensor_delete_name = s;
 }
-void MainWindow::update_add_name(const QString &s){
-    this->sensor_add_name = s;
-}
-void MainWindow::update_delete_name(const QString &s){
-    this->sensor_delete_name = s;
-}
-void MainWindow::onToggleButtonadd(bool checked){
+void MainWindow::onToggleButton(bool checked,bool add,const QString &type){
     if(!checked){
         return;
     }
-    QRadioButton *tempButton = qobject_cast<QRadioButton*>(sender());
 
-    if(tempButton){
-        if (tempButton->text() == "Temperature ") {
-            this->sensor_add_type = 1;
-        } else if (tempButton->text() == "Humidité ") {
-            this->sensor_add_type = 2;
-        } else if (tempButton->text() == "Son ") {
-            this->sensor_add_type = 3;
-        } else if (tempButton->text() == "Lumière ") {
-            this->sensor_add_type = 4;
-        }
-    }
-}
-void MainWindow::onToggleButtondelete(bool checked){
-    if(!checked){
-        return;
-    }
-    QRadioButton *tempButton = qobject_cast<QRadioButton*>(sender());
-
-    if(tempButton){
-        if (tempButton->text() == "Temperature ") {
-            this->sensor_delete_type = 1;
-        } else if (tempButton->text() == "Humidité ") {
-            this->sensor_delete_type = 2;
-        } else if (tempButton->text() == "Son ") {
-            this->sensor_delete_type = 3;
-        } else if (tempButton->text() == "Lumière ") {
-            this->sensor_delete_type = 4;
+    if(!type.isEmpty()){
+        if (type == "Temperature") {
+            if(add){
+                this->sensor_add_type = 1;
+            }
+            else
+                this->sensor_delete_type = 1;
+        } else if (type == "Humidité") {
+            if(add)
+                this->sensor_add_type = 2;
+            else
+                this->sensor_delete_type = 2;
+        } else if (type == "Son") {
+            if(add)
+                this->sensor_add_type = 3;
+            else
+                this->sensor_delete_type = 3;
+        } else if (type == "Lumière") {
+            if(add)
+                this->sensor_add_type = 4;
+            else
+                this->sensor_delete_type = 4;
         }
     }
 }
@@ -359,34 +356,34 @@ void MainWindow::update_Arrow(unsigned int sensor_type,bool server){
 
     switch(sensor_type){
         case 1:{ // Temperature
-            this->sensor_diagram->add_scheduler_Arrow(first_sensor,"t");
+            this->sensor_diagram->add_arrow(true,first_sensor,"t");
             if(server)
                 QTimer::singleShot(500,this,[this,first_sensor,heigth](){
-                    this->sensor_diagram->add_server_Arrow(first_sensor + heigth,"t");
+                    this->sensor_diagram->add_arrow(false,first_sensor + heigth,"t");
                 });
             break;
         }
         case 2:{ // Humidité
-            this->sensor_diagram->add_scheduler_Arrow(first_sensor + space,"h");
+            this->sensor_diagram->add_arrow(true,first_sensor + space,"h");
             if(server)
                 QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
-                    this->sensor_diagram->add_server_Arrow(first_sensor + space + heigth,"h");
+                    this->sensor_diagram->add_arrow(false,first_sensor + space + heigth,"h");
                 });
             break;
         }
         case 3:{ // Son
-            this->sensor_diagram->add_scheduler_Arrow(first_sensor + 2*space,"s");
+            this->sensor_diagram->add_arrow(true,first_sensor + 2*space,"s");
             if(server)
                 QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
-                   this->sensor_diagram->add_server_Arrow(first_sensor + 2*(space) + heigth,"s");
+                   this->sensor_diagram->add_arrow(false,first_sensor + 2*(space) + heigth,"s");
                 });
             break;
         }
         case 4:{ // Lumière
-            this->sensor_diagram->add_scheduler_Arrow(first_sensor + 3*space,"l");
+            this->sensor_diagram->add_arrow(true,first_sensor + 3*space,"l");
             if(server)
                 QTimer::singleShot(500,this,[this,first_sensor,space,heigth](){
-                    this->sensor_diagram->add_server_Arrow(first_sensor + 3*(space) + heigth,"l");
+                    this->sensor_diagram->add_arrow(false,first_sensor + 3*(space) + heigth,"l");
                 });
             break;
         }
@@ -399,4 +396,19 @@ void MainWindow::print_data(const QString &data){
     this->consoleTextEdit->append(data);
 }
 MainWindow::~MainWindow() {
+}
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    // Demander confirmation avant de fermer la fenêtre
+    QMessageBox::StandardButton resBtn = QMessageBox::question(
+        this, "Confirmation de fermeture",
+        tr("Êtes-vous sûr de vouloir fermer cette fenêtre?\n"),
+        QMessageBox::No | QMessageBox::Yes,
+        QMessageBox::Yes);  // Par défaut, le bouton "Yes" est sélectionné
+
+    if (resBtn == QMessageBox::Yes) {
+        event->accept();  // Fermer la fenêtre
+    } else {
+        event->ignore();  // Ne pas fermer la fenêtre
+    }
 }

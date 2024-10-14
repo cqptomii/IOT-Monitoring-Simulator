@@ -10,10 +10,8 @@ class DiagramWidget : public QWidget
 public:
     explicit DiagramWidget(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event) override;
-    void add_scheduler_Arrow(const QPoint &end,const QString &s);
-    void add_server_Arrow(const QPoint &end,const QString &s);
-    void remove_server_arrow(const QString &s);
-    void remove_scheduler_arrow(const QString &s);
+    void add_arrow(bool scheduler,const QPoint &end,const QString &s);
+    void remove_arrow(bool scheduler,const QString &s);
     void update_sensor_count(int t,int h,int s,int l);
     void draw_sensor_number(QPainter &painter,const QPoint &position, int number);
     QPoint& get_firstSensor_pos();

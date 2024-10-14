@@ -91,23 +91,23 @@ void DiagramWidget::paintEvent(QPaintEvent *event){
         painter.drawLine(it.value());
     }
 }
-void DiagramWidget::add_scheduler_Arrow(const QPoint &end,const QString &s){
-    scheduler_arrows.insert(s,QLine(this->scheduler,end));
+void DiagramWidget::add_arrow(bool scheduler,const QPoint &end,const QString &s){
+    if(scheduler){
+        scheduler_arrows.insert(s,QLine(this->scheduler,end));
+        QTimer::singleShot(1000,this, [this,s](){remove_arrow(true,s);} );
+    }else{
+        server_arrows.insert(s,QLine(this->server,end));
+        QTimer::singleShot(1000,this, [this,s](){remove_arrow(false,s);} );
+    }
     update();
-    QTimer::singleShot(1000,this, [this,s](){remove_scheduler_arrow(s);} );
 }
-void DiagramWidget::add_server_Arrow(const QPoint &end,const QString &s){
-    server_arrows.insert(s,QLine(this->server,end));
-    update();
-    QTimer::singleShot(1000,this, [this,s](){remove_server_arrow(s);} );
-}
-void DiagramWidget::remove_scheduler_arrow(const QString &s){
-    scheduler_arrows.remove(s);
+void DiagramWidget::remove_arrow(bool scheduler,const QString &s){
+    if(scheduler)
+        scheduler_arrows.remove(s);
+    else
+        server_arrows.remove(s);
+
     qDebug() << "Remove arrow";
-    update();
-}
-void DiagramWidget::remove_server_arrow(const QString &s){
-    server_arrows.remove(s);
     update();
 }
 QPoint& DiagramWidget::get_firstSensor_pos(){

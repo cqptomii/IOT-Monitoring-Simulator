@@ -1,15 +1,23 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "headers/Scheduler.hpp"
+#include "headers/diagramwidget.h"
+#include "src/Sensor/Sensor.h"
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QCheckBox>
 #include <QRadioButton>
-#include "headers/Scheduler.hpp"
-#include "headers/diagramwidget.h"
-#include "src/Sensor/Sensor.h"
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QScrollArea>
+#include <QLabel>
+#include <QGroupBox>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 class MainWindow : public QMainWindow
 {
@@ -21,17 +29,15 @@ public:
 private slots:
     void onStartButtonClicked();  // Déclaration du slot
     void onStopButtonClicked();
-    void addSensorClicked();
-    void deleteSensorClicked();
-    void HandleConsoleLog(bool checked);
-    void HandleFileLog(bool checked);
-    void onToggleButtonadd(bool checked);
-    void onToggleButtondelete(bool checked);
-    void update_add_name(const QString &s);
-    void update_delete_name(const QString &s);
+    void sensor_clicked(bool add);
+    void handle_log(bool checked,bool console);
+    void onToggleButton(bool checked,bool add,const QString &type);
+    void update_name(const QString &s,bool add);
     void update_Arrow(unsigned int sensor_type,bool server);
     void print_data(const QString &data);
     void recieve_scheduler_message(const QString &message);
+protected:
+    void closeEvent(QCloseEvent *event) override;
 private:
 
     Scheduler *Mainprocess;

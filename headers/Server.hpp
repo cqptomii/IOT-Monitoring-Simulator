@@ -176,19 +176,11 @@ public:
     /**
      * @brief Setter de l'attribut file_logs : permet d'activer l'écriture de log dans des fichiers annexes
      */
-    void enableFileLog();
-    /**
-     * @brief Setter de l'attribut file_logs : permet de désactiver l'écriture de log dans les fichiers annexes
-     */
-    void disableFileLog();
+    void setFileLog(bool check);
     /**
      * @brief Setter de l'attribut file_logs : permet d'activer l'écriture de log dans des fichiers annexes
      */
-    void enableConsoleLog();
-    /**
-     * @brief Setter de l'attribut file_logs : permet de désactiver l'écriture de log dans les fichiers annexes
-     */
-    void disableConsoleLog();
+    void setConsoleLog(bool check);
 signals:
     void data_to_display(const QString& message);
 };
