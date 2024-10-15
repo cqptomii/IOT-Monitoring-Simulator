@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 #include "Scheduler.hpp"
 
 int main(int argc,char *argv[]) {
@@ -27,33 +28,17 @@ int main(int argc,char *argv[]) {
     std::cout << "---" << std::endl << "Bienvenue sur le simulateur IOT" << std::endl << "---" << std::endl;
 
     Scheduler Mainprocess;
-
-    std::cout << "Configuration du serveur :" << std::endl;
-
-    // Configuration des logs de console
-    do {
-        std::cout << " Activer les logs de console (Y/N) : ";
-        std::cin >> temp;
-    } while (toupper(temp) != 'Y' && toupper(temp) != 'N');
-    console_log = (toupper(temp) == 'Y');  // Conversion de la réponse en booléen
-
-    // Configuration des logs de fichier
-    do {
-        std::cout << " Activer les logs de fichier (Y/N) : ";
-        std::cin >> temp;
-    } while (toupper(temp) != 'Y' && toupper(temp) != 'N');
-    file_log = (toupper(temp) == 'Y');  // Conversion de la réponse en booléen
-
     Server server(console_log, file_log);
+
     Mainprocess << server;
 
-    std::cout << "Ajout de Capteurs dans la simulation" << std::endl;
     do {
+        std::cout << "Ajout de Capteurs dans la simulation" << std::endl;
         std::string sensor_n;
         std::cout << "Donner le nom du capteur : ";
         std::cin >> sensor_n;
 
-        std::cout << "Choisir le type de Capteur : T: température / H: humidité / S: sound / L: lumière : ";
+        std::cout << "Choisir le type de Capteur : T: temperature - H: humidite - S: son - L: lumiere" << std::endl; ;
         std::cin >> temp;
 
         switch (toupper(temp)) {
@@ -87,21 +72,24 @@ int main(int argc,char *argv[]) {
             std::cin >> temp;
         } while (toupper(temp) != 'Y' && toupper(temp) != 'N');
         add = (toupper(temp) == 'Y');  // Si la réponse est 'Y', on continue d'ajouter des capteurs
+        system("cls");
     } while (add);
 
     // Démarrage de la simulation
     do {
-        std::cout << "Voulez-vous lancer la simulation (Y/N) ? ";
+        std::cout << "Voulez-vous lancer la simulation (Y/N) ? " << std::endl;
         std::cin >> temp;
     } while (toupper(temp) != 'Y' && toupper(temp) != 'N');
 
     if (toupper(temp) == 'Y') {
+        system("cls");
+        std::cout << "----Début de la simlation----" << std::endl;
         Mainprocess.start();
+        do {
+            std::cout << "Entrez Y pour stopper la simulation ";
+            std::cin >> temp;
+        } while (toupper(temp) != 'Y');
     }
-    do {
-        std::cout << "Voulez-vous stopper la simulation (Y/N) ? ";
-        std::cin >> temp;
-    } while (toupper(temp) != 'Y');
     if(temp){
         Mainprocess.stop();
     }
