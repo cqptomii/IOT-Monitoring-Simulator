@@ -4,19 +4,19 @@
 
 #include "Humidity.hpp"
 
-Humidity::Humidity() : Sensor<float>("H_sensor") {
+Humidity::Humidity() : Sensor("H_sensor") {
     this->type = "Humidity";
     generateId();
 }
 
-Humidity::Humidity(const Humidity &hum) : Sensor<float>(hum) {}
+Humidity::Humidity(const Humidity &hum) : Sensor(hum) {}
 
 Humidity::Humidity(std::string sensor_name) : Sensor(std::move(sensor_name)) {
     this->type = "Humidity";
     generateId();
 }
 Humidity &Humidity::operator=(const Humidity &hum) {
-    Sensor<float>::operator=(hum);
+    Sensor::operator=(hum);
     return *this;
 }
 
@@ -26,4 +26,14 @@ void Humidity::readValue() {
     std::uniform_real_distribution<float> distribution(0.0,100.0);
 
     this->data = distribution(generator);
+}
+
+void Humidity::send_data() {
+    std::tuple<time_t,size_t,std::string, std::string , float> message(time(nullptr),ID,type,name,data);
+    if(associed_server)
+        *this->associed_server << message;
+}
+
+std::unique_ptr<Sensor> Humidity::clone() const {
+    return std::make_unique<Humidity>(*this);
 }

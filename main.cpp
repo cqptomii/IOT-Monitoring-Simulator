@@ -1,9 +1,8 @@
 #include <iostream>
-#include <stdlib.h>
 #include "Scheduler.hpp"
 
 int main(int argc,char *argv[]) {
-    bool console_log = false, file_log = false, add = true;
+    bool console_log = true, file_log = false, add;
     char temp;
     std::string argument;
     for (int i = 1; i < argc; i++) {
@@ -38,41 +37,39 @@ int main(int argc,char *argv[]) {
         std::cout << "Donner le nom du capteur : ";
         std::cin >> sensor_n;
 
-        std::cout << "Choisir le type de Capteur : T: temperature - H: humidite - S: son - L: lumiere" << std::endl; ;
+        std::cout << "Choisir le type de Capteur : T: temperature - H: humidite - S: son - L: lumiere" << std::endl;
         std::cin >> temp;
 
         switch (toupper(temp)) {
             case 'T': {
                 Temperature addT(sensor_n);
-                Mainprocess << addT;
+                Mainprocess << addT.clone();
                 break;
             }
             case 'H': {
                 Humidity addT(sensor_n);
-                Mainprocess << addT;
+                Mainprocess << addT.clone();
                 break;
             }
             case 'S': {
                 Sound addT(sensor_n);
-                Mainprocess << addT;
+                Mainprocess << addT.clone();
                 break;
             }
             case 'L': {
                 Light addT(sensor_n);
-                Mainprocess << addT;
+                Mainprocess << addT.clone();
                 break;
             }
             default:
                 std::cout << "Type de capteur non reconnu." << std::endl;
                 break;
         }
-
         do {
             std::cout << "Ajouter un autre capteur (Y/N) ? ";
             std::cin >> temp;
         } while (toupper(temp) != 'Y' && toupper(temp) != 'N');
         add = (toupper(temp) == 'Y');  // Si la réponse est 'Y', on continue d'ajouter des capteurs
-        system("cls");
     } while (add);
 
     // Démarrage de la simulation
@@ -82,11 +79,10 @@ int main(int argc,char *argv[]) {
     } while (toupper(temp) != 'Y' && toupper(temp) != 'N');
 
     if (toupper(temp) == 'Y') {
-        system("cls");
         std::cout << "----Début de la simlation----" << std::endl;
         Mainprocess.start();
         do {
-            std::cout << "Entrez Y pour stopper la simulation ";
+            std::cout << "Entrez Y pour stopper la simulation " << std::endl;
             std::cin >> temp;
         } while (toupper(temp) != 'Y');
     }

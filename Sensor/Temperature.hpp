@@ -4,14 +4,16 @@
 
 #ifndef TP_TEMPERATURE_HPP
 #define TP_TEMPERATURE_HPP
-#include "Sensor.h"
+#include "Sensor.hpp"
 
-class Temperature : public Sensor<float>{
+class Temperature : public Sensor{
 private:
+    float data;
     /**
      * @brief méthode qui permet de générer une valeur de type float entre 8.5 et 27.0
      */
     void readValue() override;
+    void send_data() override;
 public:
     /**
      * @brief Constructeur par default
@@ -37,6 +39,7 @@ public:
      * @return référence vers l'objet courant
      */
     Temperature& operator=(const Temperature& temp);
+    std::unique_ptr<Sensor> clone() const override;
 };
 
 

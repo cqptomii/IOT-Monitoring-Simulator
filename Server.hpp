@@ -57,10 +57,10 @@ private:
 
         str_time.pop_back(); // supprime le "\n"
 
-        os << str_time << " " << // current Time
-                   std::get<1>(data) << " " << // Sensor ID
-                   std::get<2>(data) << " " << // Sensor Type
-                   std::get<3>(data) << " " << // Senor name
+        os << str_time << "    " << // current Time
+                   std::get<1>(data) << "   " << // Sensor ID
+                   std::get<2>(data) << "   " << // Sensor Type
+                   std::get<3>(data) << "   " << // Senor name
                    std::get<4>(data) << std::endl; // current data
     }
 
@@ -84,7 +84,7 @@ private:
                 }
             }
 
-            std::string sensor_logs_folder =(server_log_path / (std::get<2>(data) + "_" + std::get<3>(data) + ".txt")).string();
+            std::string sensor_logs_folder =(server_log_path / (std::get<2>(data) + "_" + std::get<3>(data) + ".csv")).string();
             std::cout << sensor_logs_folder;
             // Creation du fichier log associé au capteur si non existant
             try {
@@ -96,7 +96,7 @@ private:
                 log.exceptions(std::ofstream::failbit | std::ofstream::badbit); // active les exceptions failbit / badbit
 
                 if(!file_exist){
-                    log << "Date ID Type Name Value" << std::endl;
+                    log << "Date    ID    Type    Name    Value" << std::endl;
                 }
                 fileWrite(log, data);
 

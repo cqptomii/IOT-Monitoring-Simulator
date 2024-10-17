@@ -4,14 +4,16 @@
 
 #ifndef TP_SOUND_HPP
 #define TP_SOUND_HPP
-#include "Sensor.h"
+#include "Sensor.hpp"
 
-class Sound : public Sensor<int>{
+class Sound : public Sensor{
 private:
+    int data;
     /**
      * @brief méthode qui permet de générer une valeur de type int entre 0 et 120
      */
     void readValue() override;
+    void send_data() override;
 public:
     /**
      * @brief Constructeur par default de la classe
@@ -37,6 +39,7 @@ public:
      * @return référence vers l'objet courant
      */
     Sound& operator=(const Sound& s);
+    std::unique_ptr<Sensor> clone() const override;
 };
 
 

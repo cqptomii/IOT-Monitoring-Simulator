@@ -4,14 +4,16 @@
 
 #ifndef TP_HUMIDITY_HPP
 #define TP_HUMIDITY_HPP
-#include "Sensor.h"
+#include "Sensor.hpp"
 
-class Humidity : public Sensor<float> {
+class Humidity : public Sensor{
 private:
+    float data;
     /**
      * @brief méthode qui permet de générer une valeur de type float entre 0 et 100.0
      */
     void readValue() override;
+    void send_data() override;
 public:
     /**
      * @brief Constructeur par default
@@ -37,6 +39,7 @@ public:
      * @return référence vers l'objet courant
      */
     Humidity& operator=(const Humidity& hum);
+    std::unique_ptr<Sensor> clone() const override;
 };
 
 
