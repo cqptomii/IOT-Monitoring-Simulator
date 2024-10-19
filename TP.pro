@@ -19,7 +19,7 @@ SOURCES += \
     src/Sensor/Humidity.cpp \
     src/Sensor/Light.cpp \
     src/Sensor/Sound.cpp \
-    src/Sensor/Sensor.h \
+    src/Sensor/Sensor.cpp \
 
 HEADERS += \
     headers/mainwindow.h \
@@ -30,6 +30,7 @@ HEADERS += \
     headers/Humidity.hpp \
     headers/Light.hpp \
     headers/Sound.hpp \
+    src/Sensor/Sensor.hpp \
 
 FORMS += \
     form/mainwindow.ui

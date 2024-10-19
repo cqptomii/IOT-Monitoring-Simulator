@@ -6,17 +6,15 @@
 
 #include <utility>
 
-Light::Light() : Sensor<bool>("L_sensor") {
+Light::Light() : Sensor("L_sensor") {
     this->type = "Light";
     generateId();
 }
 
-Light::Light(const Light &l) : Sensor<bool>(l){
-    this->type = l.type;
-}
+Light::Light(const Light &l) : Sensor(l){}
 
 Light &Light::operator=(const Light &l) {
-    Sensor<bool>::operator=(l);
+    Sensor::operator=(l);
     return *this;
 }
 
@@ -31,4 +29,14 @@ void Light::readValue(){
     std::bernoulli_distribution bool_distrib(0.5);
 
     this->data = bool_distrib(generator);
+}
+
+void Light::send_data() {
+    std::tuple<time_t,size_t,std::string, std::string , bool> message(time(nullptr),ID,type,name,data);
+    if(associed_server)
+        *this->associed_server << message;
+}
+
+std::unique_ptr<Sensor> Light::clone() const {
+    return std::make_unique<Light>(*this);
 }

@@ -252,7 +252,7 @@ void MainWindow::sensor_clicked(bool add){
             case 1 :{
                 if(add){
                     Temperature addT(this->sensor_add_name.toStdString());
-                    *Mainprocess << addT;
+                    *Mainprocess << addT.clone();
                     this->t_count++;
                 }else{
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Temperature"))
@@ -263,7 +263,7 @@ void MainWindow::sensor_clicked(bool add){
             case 2:{
                 if(add){
                     Humidity addH(this->sensor_add_name.toStdString());
-                    *Mainprocess << addH;
+                    *Mainprocess << addH.clone();
                     this->h_count++;
                 }else{
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Humidity"))
@@ -274,7 +274,7 @@ void MainWindow::sensor_clicked(bool add){
             case 3:{
                 if(add){
                     Sound addS(this->sensor_add_name.toStdString());
-                    *Mainprocess << addS;
+                    *Mainprocess << addS.clone();
                     this->s_count++;
                 }else{
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Sound"))
@@ -285,7 +285,7 @@ void MainWindow::sensor_clicked(bool add){
             case 4:{
                 if(add){
                     Light addL(this->sensor_add_name.toStdString());
-                    *Mainprocess << addL;
+                    *Mainprocess << addL.clone();
                     this->l_count++;
                 }else{
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Ligth"))

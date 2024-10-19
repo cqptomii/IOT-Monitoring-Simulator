@@ -4,13 +4,15 @@
 
 #ifndef TP_LIGHT_HPP
 #define TP_LIGHT_HPP
-#include "src/Sensor/Sensor.h"
-class Light : public Sensor<bool>{
+#include "src/Sensor/Sensor.hpp"
+class Light : public Sensor{
 private:
+    bool data;
     /**
      * @brief méthode qui permet de générer une valeur aléatoire de type bool
      */
     void readValue() override;
+    void send_data() override;
 public:
     /**
      * @brief Constructeur par default de la classe
@@ -36,6 +38,7 @@ public:
      * @return référence vers l'objet courant
      */
     Light& operator=(const Light& l);
+    std::unique_ptr<Sensor> clone() const override;
 };
 
 

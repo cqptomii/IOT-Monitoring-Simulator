@@ -6,13 +6,13 @@
 
 #include <utility>
 
-Sound::Sound() : Sensor<int>(){
+Sound::Sound() : Sensor("S_sensor"){
     this->type = "Sound";
     generateId();
 }
 
-Sound::Sound(const Sound &s) : Sensor<int>(s) {
-    this->type = s.type;
+Sound::Sound(const Sound &s) : Sensor(s) {
+    this->data = s.data;
 }
 
 Sound::Sound(std::string sensor_name) : Sensor(std::move(sensor_name)) {
@@ -21,7 +21,7 @@ Sound::Sound(std::string sensor_name) : Sensor(std::move(sensor_name)) {
 }
 
 Sound &Sound::operator=(const Sound &s) {
-    Sensor<int>::operator=(s);
+    Sensor::operator=(s);
     return *this;
 }
 
@@ -31,4 +31,14 @@ void Sound::readValue()  {
     std::uniform_int_distribution distribution(0,120);
 
     this->data = distribution(generator);
+}
+
+void Sound::send_data() {
+    std::tuple<time_t,size_t,std::string, std::string , int> message(time(nullptr),ID,type,name,data);
+    if(associed_server)
+        *this->associed_server << message;
+}
+
+std::unique_ptr<Sensor> Sound::clone() const {
+    return std::make_unique<Sound>(*this);
 }

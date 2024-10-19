@@ -3,7 +3,7 @@
 
 #include "headers/Scheduler.hpp"
 #include "headers/diagramwidget.h"
-#include "src/Sensor/Sensor.h"
+#include "src/Sensor/Sensor.hpp"
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTextEdit>
