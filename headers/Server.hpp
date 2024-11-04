@@ -42,7 +42,7 @@ private:
         QString currentData = QString::number(std::get<4>(data));                   // Current data (float)
 
         // Concaténer tous les éléments
-        QString str_time = sensorID + "  ,  " +
+        QString str_time = sensorID + "    " +
                            sensorType + "    " +
                            sensorName + "    " +
                            currentData;
@@ -72,10 +72,10 @@ private:
 
         str_time.pop_back(); // supprime le "\n"
 
-        os << str_time << "  ,  " << // current Time
-                   std::get<1>(data) << "  ,  " << // Sensor ID
-                   std::get<2>(data) << "  ,  " << // Sensor Type
-                   std::get<3>(data) << "  ,  " << // Senor name
+        os << str_time << ";" << // current Time
+                   std::get<1>(data) << ";" << // Sensor ID
+                   std::get<2>(data) << ";" << // Sensor Type
+                   std::get<3>(data) << ";" << // Senor name
                    std::get<4>(data) << std::endl; // current data
     }
 

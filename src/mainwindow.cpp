@@ -245,13 +245,13 @@ void MainWindow::sensor_clicked(bool add){
                 this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant d'ajouter un capteur");
                 return;
             }
-            this->consoleTextEdit->append("Ajout d'un capteur");
+            text.append("Ajout d'un capteur");
         }else{
             if(this->sensor_delete_name == "" || this->sensor_delete_type > 4){
                 this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant de supprimer un capteur");
                 return;
             }
-            text.append("Suppréssion d'un capteur ");
+            text.append("Suppréssion d'un capteur");
         }
         switch(this->sensor_add_type){
             case 1 :{
@@ -263,7 +263,7 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Temperature"))
                         this->t_count--;
                 }
-                text.append("de Température");
+                text.append(" de Température");
                 break;
             }
             case 2:{
@@ -275,7 +275,7 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Humidity"))
                         this->h_count--;
                 }
-                text.append("d'humidité");
+                text.append(" d'humidité");
                 break;
             }
             case 3:{
@@ -287,7 +287,7 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Sound"))
                         this->s_count--;
                 }
-                text.append("de son");
+                text.append(" de son");
                 break;
             }
             case 4:{
