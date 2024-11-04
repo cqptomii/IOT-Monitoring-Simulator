@@ -8,7 +8,7 @@ add_executable(TP main.cpp
         Server.cpp
         Scheduler.cpp
         Scheduler.hpp
-        Sensor/Sensor.h
+        Sensor/Sensor.hpp
         Sensor/Light.hpp
         Sensor/Light.cpp
         Sensor/Temperature.hpp
@@ -19,4 +19,5 @@ add_executable(TP main.cpp
         Sensor/Humidity.cpp
         Barrier.hpp
         Barrier.cpp
+        Sensor/Sensor.cpp
 )

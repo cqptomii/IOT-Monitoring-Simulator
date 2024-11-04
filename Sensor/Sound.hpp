@@ -13,6 +13,9 @@ private:
      * @brief méthode qui permet de générer une valeur de type int entre 0 et 120
      */
     void readValue() override;
+    /**
+     * #brief méthode virtuelle pure qui permet d'envoyer la valeur courante du capteur au serveur
+     */
     void send_data() override;
 public:
     /**
@@ -39,6 +42,10 @@ public:
      * @return référence vers l'objet courant
      */
     Sound& operator=(const Sound& s);
+    /**
+     * @brief méthode virtuelle pure permettant de récupérer le pointeur unique de l'instance du capteur de son
+     * @return instance du pointeur unique vers le capteur
+     */
     std::unique_ptr<Sensor> clone() const override;
 };
 

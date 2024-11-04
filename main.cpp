@@ -89,5 +89,7 @@ int main(int argc,char *argv[]) {
     if(temp){
         Mainprocess.stop();
     }
+    std::cout << "Appuyer sur ENTER pour fermer le programme" << std::endl;
+    std::cin >> temp;
     return 0;
 }

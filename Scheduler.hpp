@@ -38,14 +38,6 @@ private:
      * @param thread_id : identifiants des différents threads
      */
     void runTasks();
-
-    /**
-     * @brief méthode qui appel la fonction update sur une des listes de capteurs en fonctions de de la variable thread-id
-     * @param thread_id : identifiants des différents threads
-     */
-    /*
-    void updateList(unsigned int thread_id);
-    **/
     /**
      * @brief méthode qui permet d'associer un Server à notre Scheduler
      * @param server : pointeur partagée vers le server

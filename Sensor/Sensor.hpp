@@ -21,6 +21,9 @@ private:
      */
     virtual void readValue() = 0;
 
+    /**
+     * #brief méthode virtuelle pure qui permet d'envoyer la valeur courante du capteur au serveur
+     */
     virtual void send_data() = 0;
     /**
      * @brief met à jour la valeur du capteur si le capteur est prêt à lire une valeur
@@ -86,6 +89,10 @@ public:
      * @param interval : interval modifié
      */
     void setIntervalRead(unsigned int interval);
+    /**
+     * @brief méthode virtuelle pure permettant de récupérer le pointeur unique de l'instance du capteur
+     * @return instance du pointeur unique vers le capteur
+     */
     virtual std::unique_ptr<Sensor> clone() const = 0;
     
     friend class Scheduler;
