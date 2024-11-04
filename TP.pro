@@ -12,7 +12,6 @@ SOURCES += \
     src/diagramwidget.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
-    src/Barrier.cpp \
     src/Scheduler.cpp \
     src/Server.cpp \
     src/Sensor/Temperature.cpp \

@@ -13,6 +13,9 @@ private:
      * @brief méthode qui permet de générer une valeur de type float entre 8.5 et 27.0
      */
     void readValue() override;
+    /**
+     * #brief méthode virtuelle pure qui permet d'envoyer la valeur courante du capteur au serveur
+     */
     void send_data() override;
 public:
     /**
@@ -39,6 +42,10 @@ public:
      * @return référence vers l'objet courant
      */
     Temperature& operator=(const Temperature& temp);
+    /**
+     * @brief méthode virtuelle pure permettant de récupérer le pointeur unique de l'instance du capteur de température
+     * @return instance du pointeur unique vers le capteur
+     */
     std::unique_ptr<Sensor> clone() const override;
 };
 

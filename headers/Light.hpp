@@ -12,6 +12,9 @@ private:
      * @brief méthode qui permet de générer une valeur aléatoire de type bool
      */
     void readValue() override;
+    /**
+     * #brief méthode virtuelle pure qui permet d'envoyer la valeur courante du capteur au serveur
+     */
     void send_data() override;
 public:
     /**
@@ -38,6 +41,10 @@ public:
      * @return référence vers l'objet courant
      */
     Light& operator=(const Light& l);
+    /**
+     * @brief méthode virtuelle pure permettant de récupérer le pointeur unique de l'instance du capteur de lumière
+     * @return instance du pointeur unique vers le capteur
+     */
     std::unique_ptr<Sensor> clone() const override;
 };
 

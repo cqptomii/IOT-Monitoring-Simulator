@@ -9,7 +9,6 @@
 #include "headers/Temperature.hpp"
 #include "headers/Humidity.hpp"
 #include "headers/Server.hpp"
-#include "headers/Barrier.hpp"
 #include <memory>
 #include <list>
 #include <thread>
@@ -55,7 +54,16 @@ private:
      * @return true / false
      */
     bool isReady();
+    /**
+     * @brief UpdateSensorDisplay méthode permettant de mettre à jour la fenêtre principale du projet en affichant les flèches représentant les messages des capteurs
+     * @param sensor_type : type du capteur qui envoie le message
+     * @param server : type de flèche (true = capteur -> server, false = scheduler -> capteur)
+     */
     void UpdateSensorDisplay(const std::string&sensor_type,bool server);
+    /**
+     * @brief send_message_to_window méthode permettant d'envoyer un message dans la console de la fenêtre principale
+     * @param s : chaine de caractère a afficher
+     */
     void send_message_to_window(const QString& s);
 public:
 
@@ -96,6 +104,12 @@ public:
      */
     void operator<<(std::unique_ptr<Sensor> s);
 
+    /**
+     * @brief remove_sensor méthode permettant de supprimer un capteur de la base de donnée
+     * @param name : nom du capteur
+     * @param type : type du capteur
+     * @return true : succès / false : echec
+     */
     bool remove_sensor(const std::string name,const std::string type);
     /**
      * @brief méthode qui permet de lancer la simulation par le Scheduler
@@ -107,7 +121,16 @@ public:
      */
     void stop();
 signals:
+    /**
+     * @brief drawArrow signal entre la classe diagrammewidget et le scheduler afin d'afficher une flèche sur le diagramme
+     * @param sensor_type : type du capteur qui envoie le message
+     * @param server : type de flèche (true = capteur -> server, false = scheduler -> capteur)
+     */
     void drawArrow(unsigned int sensor_type,bool server);
+    /**
+     * @brief send_message_to_window méthode permettant d'envoyer un message dans la console de la fenêtre principale
+     * @param s : chaine de caractère a afficher
+     */
     void send_message(const QString &s);
 };
 

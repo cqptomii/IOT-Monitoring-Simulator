@@ -229,24 +229,29 @@ void MainWindow::onStartButtonClicked() {
     }
 }
 void MainWindow::onStopButtonClicked(){
-    this->Mainprocess->stop();
-    this->consoleTextEdit->clear();
-    this->consoleTextEdit->append("Fin de la simulation");
-    this->is_started = false;
-    update();
+    if(this->is_started){
+        this->Mainprocess->stop();
+        this->consoleTextEdit->clear();
+        this->consoleTextEdit->append("Fin de la simulation");
+        this->is_started = false;
+        update();
+    }
 }
 void MainWindow::sensor_clicked(bool add){
     if(!is_started){
+        QString text;
         if(add){
             if(this->sensor_add_name == "" || this->sensor_add_type > 4){
                 this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant d'ajouter un capteur");
                 return;
             }
+            this->consoleTextEdit->append("Ajout d'un capteur");
         }else{
             if(this->sensor_delete_name == "" || this->sensor_delete_type > 4){
                 this->consoleTextEdit->append("Erreur : Veuillez entrez l'ensemble des configurations avant de supprimer un capteur");
                 return;
             }
+            text.append("Suppréssion d'un capteur ");
         }
         switch(this->sensor_add_type){
             case 1 :{
@@ -258,6 +263,7 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Temperature"))
                         this->t_count--;
                 }
+                text.append("de Température");
                 break;
             }
             case 2:{
@@ -269,6 +275,7 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Humidity"))
                         this->h_count--;
                 }
+                text.append("d'humidité");
                 break;
             }
             case 3:{
@@ -280,6 +287,7 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Sound"))
                         this->s_count--;
                 }
+                text.append("de son");
                 break;
             }
             case 4:{
@@ -291,10 +299,13 @@ void MainWindow::sensor_clicked(bool add){
                     if(this->Mainprocess->remove_sensor(this->sensor_add_name.toStdString(),"Ligth"))
                         this->l_count--;
                 }
+                text.append(" de lumière");
                 break;
             }
         }
         this->sensor_diagram->update_sensor_count(t_count,h_count,s_count,l_count);
+        text.append(" dans la base de donnée");
+        this->consoleTextEdit->append(text);
     }
 }
 void MainWindow::handle_log(bool checked,bool console){

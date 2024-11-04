@@ -42,7 +42,7 @@ private:
         QString currentData = QString::number(std::get<4>(data));                   // Current data (float)
 
         // Concaténer tous les éléments
-        QString str_time = sensorID + "    " +
+        QString str_time = sensorID + "  ,  " +
                            sensorType + "    " +
                            sensorName + "    " +
                            currentData;
@@ -72,10 +72,10 @@ private:
 
         str_time.pop_back(); // supprime le "\n"
 
-        os << str_time << "    " << // current Time
-                   std::get<1>(data) << "    " << // Sensor ID
-                   std::get<2>(data) << "    " << // Sensor Type
-                   std::get<3>(data) << "    " << // Senor name
+        os << str_time << "  ,  " << // current Time
+                   std::get<1>(data) << "  ,  " << // Sensor ID
+                   std::get<2>(data) << "  ,  " << // Sensor Type
+                   std::get<3>(data) << "  ,  " << // Senor name
                    std::get<4>(data) << std::endl; // current data
     }
 
@@ -122,6 +122,10 @@ private:
         }
     }
 public:
+    /**
+     * @brief send_data_to_window méthode permettant d'envoyer un message dans la console de la fenêtre principale
+     * @param message : chaine de caractère a afficher
+     */
     void send_data_to_window(const QString &message);
     /**
      * @brief Constructeur par défault de la classe Server
@@ -182,6 +186,10 @@ public:
      */
     void setConsoleLog(bool check);
 signals:
+    /**
+     * @brief data_to_display signale permettant d'envoyer un message à la fenêtre principale
+     * @param message : message envoyé
+     */
     void data_to_display(const QString& message);
 };
 
